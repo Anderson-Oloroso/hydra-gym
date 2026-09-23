@@ -1,0 +1,35 @@
+{
+  "name": "hydra-gym",
+  "version": "1.0.0",
+  "description": "Aplicacion de linea de comandos CLI en node.js para la solución de el manejo integral de datos de un gimnasio",
+  "keywords": [
+    "node.js",
+    "mysql",
+    "gym",
+    "proyecto",
+    "cli"
+  ],
+  "homepage": "https://github.com/Anderson-Oloroso/hydra-gym#readme",
+  "bugs": {
+    "url": "https://github.com/Anderson-Oloroso/hydra-gym/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Anderson-Oloroso/hydra-gym.git"
+  },
+  "author": "Anderson-Oloroso",
+  "type": "module",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "develop": "npm run dev",
+    "start": "node src/app.js",
+    "build": "echo \"No hay proceso de build configurado\"",
+    "prod": "node src/app.js"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.3",
+    "mysql2": "^3.24.4",
+    "nodemon": "^3.1.14"
+  }
+}

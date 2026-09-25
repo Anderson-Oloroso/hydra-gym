@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import Enquirer from "enquirer";
 
 const entities = [
   'CLIENTES',
@@ -17,10 +18,24 @@ export async function mainMenu() {
     console.log(chalk.redBright('           BIENVENIDO A HYDRA GYM    '));
     console.log(chalk.blue('==================================================='));
 
-    entities.forEach((ent, i) =>{
-        console.log(chalk.green(`${i+1}. Gestión de ${ent}`));
+    const prompt = new Enquirer.Select({
+    name: 'entity',
+    message: 'Elija una opción para gestionar:',
+    choices: [
+      ...entities.map((ent, i) => ({
+        name: ent,
+        message: `${i + 1}. Gestión de ${ent}`,
+        value: ent
+      })),
+      { name: 'SALIR', message: '0. SALIR', value: 'SALIR' }
+        ]
     });
-    console.log(chalk.green(`0. SALIR`));
+
+    return await prompt.run();
+    // entities.forEach((ent, i) =>{
+    //     console.log(chalk.green(`${i+1}. Gestión de ${ent}`));
+    // });
+    // console.log(chalk.green(`0. SALIR`));
 }
 
 export function header(entity){
@@ -49,8 +64,18 @@ export async function submenu(entity) {
         ];
     }
 
-    options.forEach((item, i) => {
-        console.log(chalk.green(`${i + 1}. ${item}`));
+    const propmt = new Enquirer.Select({
+        name: 'action',
+        message: `Acción para ${entity}`,
+        choices:[
+            ...options.map((item, i) =>({
+                name: item,
+                message: `${i+1}. ${item}`,
+                value: item
+            })),
+            {name: 'Regresar', message: '0. Regresar', value: 'REGRESAR'}
+        ]
     });
-    console.log(chalk.green(`0. Regresar`));
+
+    return await propmt.run();
 }

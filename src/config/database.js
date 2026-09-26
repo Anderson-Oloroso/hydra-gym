@@ -23,12 +23,14 @@ export async function connection() {
     return dbConnection;
   } catch (err) {
     console.log(chalk.red(`Error: ${err.message}`));
+    throw err;
   }
 }
 
 export async function closeConnection() {
   if (dbConnection) {
     await dbConnection.end();
+    dbConnection = null;
     console.log(chalk.yellow('Conection Closed'));
   }
 }

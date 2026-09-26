@@ -1,7 +1,8 @@
 import { mainMenu, submenu, pause, clearScreen } from './utils/menu.js';
-import { listClient } from './commands/clienteCmd.js';
+import { listClient, getById } from './commands/clienteCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
+import Enquirer from 'enquirer';
 
 async function main(){
     while(true){
@@ -32,9 +33,16 @@ async function main(){
                                 await listClient();
                                 break;
 
+                            case 'Buscar registro por id':
+                                const id = await Enquirer.input({
+                                    message: 'Ingresa el id a buscar: '
+                                });
+                                await getById(id);
+                                break;
                             default:
                                 console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
                                 break;
+
                         }
                         break;
 

@@ -1,8 +1,7 @@
 import { mainMenu, submenu, pause, clearScreen } from './utils/menu.js';
-import { listClient, getById, getByName } from './commands/clienteCmd.js';
+import { listClient, getById, getByName, createClient} from './commands/clienteCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
-import Enquirer from 'enquirer';
 
 async function main(){
     while(true){
@@ -30,25 +29,23 @@ async function main(){
                     case 'CLIENTES':
                         switch (selectedAction) {
                             case 'Buscar registro por id':
-                                const { id } = await Enquirer.prompt({
-                                    type: 'input',
-                                    name: 'id',
-                                    message: 'Ingresa el id a buscar: '
-                                });
-                                await getById(id);
+                                await getById();
                                 break;
 
                             case 'Buscar registro por nombre':
-                                const { name } = await Enquirer.prompt({
-                                    type: 'input',
-                                    name: 'name',
-                                    message: 'Ingresa el nombre/apellido a buscar: '
-                                });
-                                await getByName(name);
+                                await getByName();
                                 break;
                             
                             case 'Listar registros':
                                 await listClient();
+                                break;
+
+                            case 'Crear registros':
+                                await createClient();
+                                break;
+
+                            case 'Actualizar registros':
+                                await updateClient();
                                 break;
 
                             default:

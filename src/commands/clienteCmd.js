@@ -198,3 +198,41 @@ export async function updateClient(){
         problem(err);
     }
 }
+
+export async function deleteClient(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el id a buscar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsClient = await ClientService.getById(id);
+        if (!existsClient || existsClient.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún cliente con el ID: ${id}`));
+            return;
+        }
+
+        console.log(chalk.cyan('Datos del cliente ...'));
+        console.table(formatClients([existsClient[0]]));
+
+        const answer = await new Enquirer.Confirm({ name: 'confirmacion', message: '¿Confirmar eliinación?', initial: false}).run();
+
+        if(answer){
+            console.log(chalk.red(`Eliminando cliente con id ${id} ...`));
+            const result = await ClientService.deleteClient(id);
+
+            console.log(result);
+
+        }
+        else{
+            console.log(chalk.blue('Eliminación cancelada cancelada'));
+        }
+    }
+    catch(err){
+        problem(err);
+    }
+}

@@ -46,4 +46,11 @@ export class ClientService {
         ]);
         return result;
     }
+
+    static async deleteClient(id){
+        const db = await connection();
+        const query = 'DELETE FROM clientes WHERE id_cliente = ?';
+        const [ row ] = await db.execute(query, [id]);
+        return row;
+    }
 }

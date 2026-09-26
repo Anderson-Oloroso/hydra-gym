@@ -6,14 +6,19 @@ const entities = [
   'PLANES DE ENTRENAMIENTO',
   'GESTIÓN FINANCIERA',
   'CATEGORIAS FINANCIERAS',
-  'PLANES DE NUTRICIÓN',
+  'PLANES DE NUTRICION',
   'DETALLE DE COMIDA DIARIA',
-  'SEGUIMIENTO FÍSICO',
+  'SEGUIMIENTO FISICO',
   'CLIENTE - PLAN DE ENTRENAMIENTO'
 ];
 
 
+export function clearScreen() {
+    process.stdout.write('\x1Bc');
+}
+
 export async function mainMenu() {
+    clearScreen();
     console.log(chalk.blue('==================================================='));
     console.log(chalk.redBright('           BIENVENIDO A HYDRA GYM    '));
     console.log(chalk.blue('==================================================='));
@@ -21,6 +26,7 @@ export async function mainMenu() {
     const prompt = new Enquirer.Select({
     name: 'entity',
     message: 'Elija una opción para gestionar:',
+    limit: 10,
     choices: [
       ...entities.map((ent, i) => ({
         name: ent,
@@ -32,10 +38,6 @@ export async function mainMenu() {
     });
 
     return await prompt.run();
-    // entities.forEach((ent, i) =>{
-    //     console.log(chalk.green(`${i+1}. Gestión de ${ent}`));
-    // });
-    // console.log(chalk.green(`0. SALIR`));
 }
 
 export function header(entity){
@@ -52,6 +54,7 @@ const crud = [
 ]
 
 export async function submenu(entity) {
+    clearScreen();
     header(entity);
 
     let options = [...crud];
@@ -78,4 +81,12 @@ export async function submenu(entity) {
     });
 
     return await propmt.run();
+}
+
+export async function pause() {
+    const prompt = new Enquirer.Invisible({
+        name: 'pause',
+        message: chalk.gray('\nPresione ENTER para continuar...')
+    });
+    await prompt.run().catch(() => {});
 }

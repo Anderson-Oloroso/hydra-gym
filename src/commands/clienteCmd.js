@@ -123,9 +123,78 @@ export async function createClient(){
             return;
         }
 
-        const resultado = await ClientService.create(newClient);
-        console.log(chalk.green.bold(`Cliente creado exitosamente con ID: ${resultado.insertId}`));
+        if (!answers.dpi.trim() || !answers.nombre.trim() || !answers.apellido.trim() || !answers.correo.trim()){
+            console.log(chalk.red('Todos los campos son obligatorios.'));
+            return;
+        }
+
+        const result= await ClientService.create(newClient);
+        console.log(chalk.green.bold(`Cliente creado exitosamente con ID: ${result.insertId}`));
     } catch (err) {
+        problem(err);
+    }
+}
+
+export async function updateClient(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el id a buscar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsClient = await ClientService.getById(id);
+        if (!existsClient || existsClient.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún cliente con el ID: ${id}`));
+            return;
+        }
+
+        const currentClient = existsClient[0];
+        console.log(chalk.cyan('Datos actuales del cliente ...'));
+        console.table(formatClients([currentClient]));
+
+        const prompt = new Enquirer.Form({
+            name: 'cliente',
+            message: 'Modifique lo que sea necesario:',
+            choices: [
+                { name: 'dpi', message: 'DPI (13 dígitos):', initial: currentClient.dpi},
+                { name: 'nombre', message: 'Nombre:', initial: currentClient.nombre },
+                { name: 'apellido', message: 'Apellido:', initial: currentClient.apellido },
+                { name: 'correo', message: 'Correo:', initial: currentClient.correo }
+            ]
+            });
+            const estadoPrompt = new Enquirer.Select({
+            name: 'activo',
+            message: 'Seleccione el estado activo:',
+            choices: [
+                { name: 'true', message: 'true', value: true },
+                { name: 'false', message: 'false', value: false }
+            ]
+        });
+
+        const answers = await prompt.run();
+        const activoSelected = await estadoPrompt.run();
+
+        const updatedClient = EntityFactory.create('clientes', {
+            dpi: answers.dpi.trim(),
+            nombre: answers.nombre.trim(),
+            apellido: answers.apellido.trim(),
+            correo: answers.correo.trim(),  
+            activo: activoSelected === 'true' ? 1 : 0
+        });
+        
+        if (!updatedClient.esDPIValido()) {
+            console.log(chalk.red('El DPI debe contener exactamente 13 caracteres.'));
+            return;
+        }
+        
+        await ClientService.updateClient(id, updatedClient);
+        console.log(chalk.green.bold(`Cliente con ID ${id} actualizado correctamente.`));
+    }
+    catch(err){
         problem(err);
     }
 }

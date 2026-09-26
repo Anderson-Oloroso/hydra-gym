@@ -32,4 +32,18 @@ export class ClientService {
         ]);
         return result;
     }
+
+    static async updateClient(id, updatedClient){
+        const db = await connection();
+        const query = 'UPDATE clientes SET dpi = ?, nombre = ?, apellido = ?, correo = ?, activo = ? WHERE id_cliente = ?';
+        const [ result ] = await db.execute(query, [
+            updatedClient.dpi,
+            updatedClient.nombre,
+            updatedClient.apellido,
+            updatedClient.correo,
+            updatedClient.activo,
+            id
+        ]);
+        return result;
+    }
 }

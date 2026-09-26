@@ -1,5 +1,5 @@
 import { mainMenu, submenu, pause, clearScreen } from './utils/menu.js';
-import { listClient, getById, getByName, createClient} from './commands/clienteCmd.js';
+import { listClient, getById, getByName, createClient, updateClient} from './commands/clienteCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 

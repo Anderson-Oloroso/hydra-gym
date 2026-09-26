@@ -20,7 +20,11 @@ export class ClientService{
     }
 
     static async getByName(name){
-        
+        const db = await connection();
+
+        const search = `%${name.toLowerCase()}%`
+        const [ row ] = await db.query('SELECT * FROM clientes WHERE LOWER(nombre) LIKE ? OR LOWER(apellido) LIKE ?', [search, search]);
+        return row;
     }
 
     static async update(){

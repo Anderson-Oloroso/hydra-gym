@@ -34,3 +34,17 @@ export async function getById(id){
         problem(err);
     }
 }
+
+export async function getByName(name){
+    try{
+        const clienteObtenido = await ClientService.getByName(name);
+        if(!clienteObtenido || clienteObtenido.length === 0){
+            console.log(chalk.yellow('La base de datos no encuentra ningún cliente con el id: ', name));
+            return;
+        }
+
+        console.table(clienteObtenido);
+    } catch (err) {
+        problem(err);
+    }
+}

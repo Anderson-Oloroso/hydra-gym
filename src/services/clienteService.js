@@ -9,8 +9,8 @@ export class ClientService{
         return rows;
     }
 
-    static async create(client){
-
+    static async create(newClient){
+        
     }
 
     static async getById(id){
@@ -27,7 +27,7 @@ export class ClientService{
         return row;
     }
 
-    static async update(){
-
+    static async update(id, newClient){
+    
     }
 }

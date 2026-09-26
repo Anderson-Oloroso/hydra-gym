@@ -30,14 +30,18 @@ async function main(){
                     case 'CLIENTES':
                         switch (selectedAction) {
                             case 'Buscar registro por id':
-                                const id = await Enquirer.input({
+                                const { id } = await Enquirer.prompt({
+                                    type: 'input',
+                                    name: 'id',
                                     message: 'Ingresa el id a buscar: '
                                 });
                                 await getById(id);
                                 break;
 
                             case 'Buscar registro por nombre':
-                                const name = await Enquirer.input({
+                                const { name } = await Enquirer.prompt({
+                                    type: 'input',
+                                    name: 'name',
                                     message: 'Ingresa el nombre/apellido a buscar: '
                                 });
                                 await getByName(name);

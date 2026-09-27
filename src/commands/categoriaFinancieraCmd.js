@@ -119,3 +119,46 @@ export async function updateFinancialCat() {
         problem(err);
     }
 }
+
+export async function deleteFinancialCat() {
+    try {
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID de la categoría a buscar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== ''
+                    ? true
+                    : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsCategory = await FinancialCatService.getById(id);
+
+        if (!existsCategory || existsCategory.length === 0) {
+            console.log(chalk.yellow(`No se encontró ninguna categoría con el ID: ${id}`));
+            return;
+        }
+
+        console.log(chalk.cyan('Datos de la categoría financiera...'));
+        console.table([existsCategory[0]]);
+
+        const answer = await new Enquirer.Confirm({
+            name: 'confirmacion',
+            message: '¿Confirmar eliminación?',
+            initial: false
+        }).run();
+
+        if (answer) {
+            console.log(chalk.red(`Eliminando categoría con ID ${id}...`));
+            await FinancialCatService.delete(id);
+            console.log(
+                chalk.green('Categoría financiera eliminada correctamente.')
+            )
+        } else {
+            console.log(chalk.blue('Eliminación cancelada.'));
+        }
+    } catch (err) {
+        problem(err);
+    }
+}

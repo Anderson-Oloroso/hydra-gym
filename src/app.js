@@ -1,6 +1,6 @@
 import { mainMenu, submenu, pause, clearScreen } from './utils/menu.js';
 import { listClient, getById, getByName, createClient, updateClient, deleteClient} from './commands/clienteCmd.js';
-import { listFinancialCat, createFinancialCat, updateFinancialCat } from './commands/categoriaFinancieraCmd.js';
+import { listFinancialCat, createFinancialCat, updateFinancialCat, deleteFinancialCat } from './commands/categoriaFinancieraCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
@@ -71,6 +71,10 @@ async function main(){
 
                                 case 'Actualizar registros':
                                     await updateFinancialCat();
+                                    break;
+
+                                case 'Eliminar registros':
+                                    await deleteFinancialCat();
                                     break;
 
                                 default:

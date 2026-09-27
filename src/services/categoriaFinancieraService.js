@@ -37,5 +37,12 @@ export class FinancialCatService{
             id
         ]);
         return result;
-    }    
+    }  
+
+    static async delete(id){
+        const db = await connection();
+        const query = 'DELETE FROM categoria_financiera WHERE id_categoria = ?';
+        const [ row ] = await db.execute(query, [id]);
+        return row;
+    }
 }

@@ -1,6 +1,13 @@
 import { connection } from "../config/database.js";
 
 export class FinancialCatService{
+
+    static async getById(id) {
+        const db = await connection();
+        const [ rows ] = await db.query('SELECT * FROM categoria_financiera WHERE id_categoria = ?', [id]);
+        return rows;
+    }
+
     static async list() {
         const db = await connection();
         const [ rows ] = await db.query('SELECT * FROM categoria_financiera');
@@ -19,4 +26,16 @@ export class FinancialCatService{
 
         return result;
     }
+
+    static async update(id, updatedFinancialCat){
+        const db = await connection();
+        const query = 'UPDATE categoria_financiera SET nombre = ?, tipo = ?, descripcion = ? WHERE id_categoria = ?';
+        const [ result ] = await db.execute(query, [
+            updatedFinancialCat.nombre,        
+            updatedFinancialCat.tipo,
+            updatedFinancialCat.descripcion,
+            id
+        ]);
+        return result;
+    }    
 }

@@ -58,3 +58,64 @@ export async function createFinancialCat(){
         problem(err);
     }
 }
+
+export async function updateFinancialCat() {
+    try {
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID de la categoría a buscar: ',
+            validate(value) {
+                return !isNaN(value) && value.trim() !== ''
+                    ? true
+                    : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsFinancialCat = await FinancialCatService.getById(id);
+
+        if (!existsFinancialCat || existsFinancialCat.length === 0) {
+            console.log(chalk.yellow(`No se encontró ninguna categoría con el ID: ${id}`));
+            return;
+        }
+
+        const currentFinancialCat = existsFinancialCat[0];
+
+        console.log(chalk.cyan('Datos actuales de la categoría...'));
+        console.table([currentFinancialCat]);
+
+        const prompt = new Enquirer.Form({
+            name: 'categoria_financiera',
+            message: 'Modifique lo que sea necesario:',
+            choices: [
+                { name: 'nombre', message: 'Nombre:', initial: currentFinancialCat.nombre },
+                { name: 'descripcion', message: 'Descripción:', initial: currentFinancialCat.descripcion }
+            ]
+        });
+
+        const tipoPrompt = new Enquirer.Select({
+            name: 'tipo',
+            message: 'Seleccione el tipo:',
+            choices: [
+                { name: 'ingreso', message: 'Ingreso', value: 'ingreso' },
+                { name: 'egreso', message: 'Egreso', value: 'egreso' }
+            ],
+            initial: currentFinancialCat.tipo
+        });
+
+        const answers = await prompt.run();
+        const tipoSelected = await tipoPrompt.run();
+
+        const updatedFinancialCat = EntityFactory.create('categoria_financiera', {
+            nombre: answers.nombre.trim(),
+            tipo: tipoSelected,
+            descripcion: answers.descripcion.trim()
+        });
+
+        await FinancialCatService.update(id, updatedFinancialCat);
+
+        console.log(chalk.green.bold(`Categoría financiera con ID ${id} actualizada correctamente.`));
+    } catch (err) {
+        problem(err);
+    }
+}

@@ -1,5 +1,6 @@
 import { mainMenu, submenu, pause, clearScreen } from './utils/menu.js';
 import { listClient, getById, getByName, createClient, updateClient, deleteClient} from './commands/clienteCmd.js';
+import { listFinancialCat } from './commands/categoriaFinancieraCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
@@ -55,10 +56,20 @@ async function main(){
                             default:
                                 console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
                                 break;
-
                         }
                         break;
 
+                        case 'CATEGORIAS FINANCIERAS':
+                            switch(selectedAction){
+                                case 'Listar registros':
+                                    await listFinancialCat();
+                                    break;
+                                
+                                default:
+                                    console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                    break;
+                            }
+                            break;
                     default:
                         console.log(chalk.yellow(`Entidad no implementada: ${selectedEntity}`));
                         break;

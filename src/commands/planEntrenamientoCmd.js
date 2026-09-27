@@ -145,3 +145,48 @@ export async function updateWorkoutPlan(){
         problem(err);
     }
 }
+
+export async function deleteWorkoutPlan(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del plan a eliminar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+        const existsPlan = await PlanEntrenamientoService.getById(id);
+        if (!existsPlan || existsPlan.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún plan de entrenamiento con el ID: ${id}`));
+            return;
+        }
+        const currentWorkoutPlan = existsPlan[0];
+        console.log(chalk.cyan('Datos del plan de entrenamiento ...'));
+        console.table(formatWorkoutPlans([currentWorkoutPlan]));
+
+        const hasRelations = await PlanEntrenamientoService.hasRelations(id);
+        if (hasRelations) {
+            console.log(chalk.red.bold('\n[ INTEGRIDAD REFERENCIAL ]'));
+            console.log(chalk.yellow(`No se puede eliminar el plan con ID ${id} porque tiene clientes o asignaciones asociadas en 'cliente_plan_entrenamiento'.`));
+            console.log(chalk.gray('Para eliminar este plan, primero debe reasignar o eliminar las relaciones correspondientes.\n'));
+            return;
+        }
+        const answer = await new Enquirer.Confirm({ 
+            name: 'confirmacion', 
+            message: '¿Confirmar eliminación?', 
+            initial: false 
+        }).run();
+        if(answer){
+            console.log(chalk.red(`Eliminando plan de entrenamiento con ID ${id} ...`));
+            const result = await PlanEntrenamientoService.delete(id);
+            console.log(chalk.green.bold(`Plan de entrenamiento con ID ${id} eliminado exitosamente.`));
+        }
+        else{
+            console.log(chalk.blue('Eliminación cancelada'));
+        }
+    }
+    catch(err){
+        problem(err);
+    }
+}

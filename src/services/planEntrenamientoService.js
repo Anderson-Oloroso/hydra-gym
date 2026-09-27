@@ -51,4 +51,25 @@ export class PlanEntrenamientoService {
         ]);
         return result;
     }
+
+    static async hasRelations(id) {
+        const db = await connection();
+        const query = 'SELECT COUNT(*) AS total FROM cliente_plan_entrenamiento WHERE id_plan = ?';
+        const [ rows ] = await db.query(query, [id]);
+        return rows[0].total > 0;
+    }
+
+    static async delete(id) {
+        const db = await connection();
+        const query = 'DELETE FROM plan_entrenamiento WHERE id_plan = ?';
+        const [ row ] = await db.execute(query, [id]);
+        return row;
+    }
+    
+    static async getLevels() {
+        const db = await connection();
+        const [ rows ] = await db.query('SELECT * FROM nivel_entrenamiento');
+        return rows;
+    }
 }
+

@@ -23,4 +23,22 @@ export class GestionFinancieraService {
         const [ rows ] = await db.query(query);
         return rows;
     }
+
+    static async create(record) {
+        const db = await connection();
+        const query = 'INSERT INTO gestion_financiera (id_categoria, id_cliente, monto, descripcion) VALUES (?, ?, ?, ?)';
+        const [ result ] = await db.execute(query, [
+            record.id_categoria,
+            record.id_cliente,
+            record.monto,
+            record.descripcion
+        ]);
+        return result;
+    }
+
+    static async getCategories() {
+        const db = await connection();
+        const [ rows ] = await db.query('SELECT * FROM categoria_financiera');
+        return rows;
+    }
 }

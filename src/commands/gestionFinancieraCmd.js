@@ -1,5 +1,8 @@
+import Enquirer from "enquirer";
 import chalk from "chalk";
+import { EntityFactory } from "../models/entityFactory.js";
 import { GestionFinancieraService } from "../services/gestionFinancieraService.js";
+import { ClientService } from "../services/clienteService.js";
 
 function problem(err){
     console.log(chalk.red.bold(`Error en operación de gestión financiera: ${err.message || err}`));
@@ -45,6 +48,100 @@ export async function listFinancialRecord(){
         }
 
         console.table(formatFinancialRecords(records));
+    } catch (err) {
+        problem(err);
+    }
+}
+
+export async function createFinancialRecord(){
+    try {
+        const categorias = await GestionFinancieraService.getCategories();
+        if (!categorias || categorias.length === 0) {
+            console.log(chalk.red('No se encontraron categorías financieras en la base de datos.'));
+            return;
+        }
+
+        const categoriaPrompt = new Enquirer.Select({
+            name: 'categoria',
+            message: 'Seleccione la categoría financiera:',
+            choices: categorias.map(c => ({
+                name: `${c.id_categoria}`,
+                message: `${c.id_categoria}. ${c.nombre} [${c.tipo.toUpperCase()}]`,
+                value: c.id_categoria
+            }))
+        });
+
+        const idCategoriaSeleccionada = await categoriaPrompt.run();
+        const categoriaEncontrada = categorias.find(c => c.id_categoria === Number(idCategoriaSeleccionada));
+
+        if (!categoriaEncontrada) {
+            console.log(chalk.red('Categoría no válida.'));
+            return;
+        }
+
+        const id_categoria = Number(categoriaEncontrada.id_categoria);
+        let id_cliente = null;
+
+        if (categoriaEncontrada.tipo === 'ingreso') {
+            const clientes = await ClientService.list();
+            if (!clientes || clientes.length === 0) {
+                console.log(chalk.red('No hay clientes registrados en el sistema. Los ingresos requieren obligatoriamente un cliente.'));
+                return;
+            }
+
+            const clientePrompt = new Enquirer.Select({
+                name: 'cliente',
+                message: 'Seleccione el cliente asociado al ingreso (obligatorio):',
+                choices: clientes.map(c => ({
+                    name: `${c.id_cliente}`,
+                    message: `${c.id_cliente}. ${c.nombre} ${c.apellido} (DPI: ${c.dpi})`,
+                    value: c.id_cliente
+                }))
+            });
+
+            const idClienteSeleccionado = await clientePrompt.run();
+            const clienteEncontrado = clientes.find(c => c.id_cliente === Number(idClienteSeleccionado));
+
+            if (!clienteEncontrado) {
+                console.log(chalk.red('Debe seleccionar un cliente válido para un ingreso.'));
+                return;
+            }
+
+            id_cliente = Number(clienteEncontrado.id_cliente);
+        } else {
+            id_cliente = null;
+        }
+
+        const prompt = new Enquirer.Form({
+            name: 'financialRecord',
+            message: 'Ingrese los datos del movimiento financiero:',
+            choices: [
+                { name: 'monto', message: 'Monto:', initial: '0.00' },
+                { name: 'descripcion', message: 'Descripción:', initial: '' }
+            ]
+        });
+
+        const answers = await prompt.run();
+
+        if (!answers.monto.trim() || !answers.descripcion.trim()) {
+            console.log(chalk.red('Monto y Descripción son obligatorios.'));
+            return;
+        }
+
+        if (isNaN(answers.monto) || parseFloat(answers.monto) <= 0) {
+            console.log(chalk.red('El monto debe ser un valor numérico positivo mayor a cero.'));
+            return;
+        }
+
+        const newFinancialRecord = EntityFactory.create('gestion_financiera', {
+            id_categoria: id_categoria,
+            id_cliente: id_cliente,
+            monto: parseFloat(answers.monto.trim()),
+            descripcion: answers.descripcion.trim()
+        });
+
+        const result = await GestionFinancieraService.create(newFinancialRecord);
+        console.log(chalk.green.bold(`Registro financiero creado exitosamente con ID: ${result.insertId}`));
     } catch (err) {
         problem(err);
     }

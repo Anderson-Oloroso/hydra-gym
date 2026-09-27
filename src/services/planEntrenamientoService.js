@@ -12,6 +12,17 @@ export class PlanEntrenamientoService {
         return rows;
     }
 
+    static async getById(id) {
+        const db = await connection();
+        const [ rows ] = await db.query(`
+            SELECT p.*, n.nombre AS nivel 
+            FROM plan_entrenamiento p 
+            LEFT JOIN nivel_entrenamiento n ON p.id_nivel = n.id_nivel 
+            WHERE p.id_plan = ?
+        `, [id]);
+        return rows;
+    }
+
     static async create(plan) {
         const db = await connection();
         const query = 'INSERT INTO plan_entrenamiento (id_nivel, nombre_plan, metas_fisicas, duracion_dias, precio, activo) VALUES (?, ?, ?, ?, ?, ?)';
@@ -22,6 +33,21 @@ export class PlanEntrenamientoService {
             plan.duracion_dias,
             plan.precio,
             plan.activo ?? 1
+        ]);
+        return result;
+    }
+
+    static async update(id, updatedPlan) {
+        const db = await connection();
+        const query = 'UPDATE plan_entrenamiento SET id_nivel = ?, nombre_plan = ?, metas_fisicas = ?, duracion_dias = ?, precio = ?, activo = ? WHERE id_plan = ?';
+        const [ result ] = await db.execute(query, [
+            updatedPlan.id_nivel,
+            updatedPlan.nombre_plan,
+            updatedPlan.metas_fisicas,
+            updatedPlan.duracion_dias,
+            updatedPlan.precio,
+            updatedPlan.activo,
+            id
         ]);
         return result;
     }

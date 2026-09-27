@@ -78,3 +78,70 @@ export async function createWorkoutPlan(){
         problem(err);
     }
 }
+
+export async function updateWorkoutPlan(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del plan a actualizar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsPlan = await PlanEntrenamientoService.getById(id);
+        if (!existsPlan || existsPlan.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún plan de entrenamiento con el ID: ${id}`));
+            return;
+        }
+
+        const currentWorkoutPlan = existsPlan[0];
+        console.log(chalk.cyan('Datos actuales del plan de entrenamiento ...'));
+        console.table(formatWorkoutPlans([currentWorkoutPlan]));
+
+        const prompt = new Enquirer.Form({
+            name: 'workoutPlan',
+            message: 'Modifique lo que sea necesario:',
+            choices: [
+                { name: 'id_nivel', message: 'ID Nivel:', initial: String(currentWorkoutPlan.id_nivel) },
+                { name: 'nombre_plan', message: 'Nombre del Plan:', initial: currentWorkoutPlan.nombre_plan },
+                { name: 'metas_fisicas', message: 'Metas Físicas:', initial: currentWorkoutPlan.metas_fisicas || '' },
+                { name: 'duracion_dias', message: 'Duración (días):', initial: String(currentWorkoutPlan.duracion_dias) },
+                { name: 'precio', message: 'Precio:', initial: String(currentWorkoutPlan.precio) }
+            ]
+        });
+
+        const estadoPrompt = new Enquirer.Select({
+            name: 'activo',
+            message: 'Seleccione el estado activo:',
+            choices: [
+                { name: 'true', message: 'true', value: true },
+                { name: 'false', message: 'false', value: false }
+            ]
+        });
+
+        const answers = await prompt.run();
+        const activoSelected = await estadoPrompt.run();
+
+        if (isNaN(answers.id_nivel) || isNaN(answers.duracion_dias) || isNaN(answers.precio)) {
+            console.log(chalk.red('ID Nivel, Duración y Precio deben ser valores numéricos válidos.'));
+            return;
+        }
+
+        const updatedWorkoutPlan = EntityFactory.create('plan_entrenamiento', {
+            id_nivel: parseInt(answers.id_nivel.trim(), 10),
+            nombre_plan: answers.nombre_plan.trim(),
+            metas_fisicas: answers.metas_fisicas.trim(),
+            duracion_dias: parseInt(answers.duracion_dias.trim(), 10),
+            precio: parseFloat(answers.precio.trim()),  
+            activo: activoSelected === 'true' ? 1 : 0
+        });
+        
+        await PlanEntrenamientoService.update(id, updatedWorkoutPlan);
+        console.log(chalk.green.bold(`Plan de entrenamiento con ID ${id} actualizado correctamente.`));
+    }
+    catch(err){
+        problem(err);
+    }
+}

@@ -1,5 +1,5 @@
 import { mainMenu, submenu, pause, clearScreen } from './utils/menu.js';
-import { listClient, getById, getByName, createClient, updateClient, deleteClient} from './commands/clienteCmd.js';
+import { listFinancialRecord, createFinancialRecord, updateFinancialRecord, deleteFinancialRecord } from './commands/gestionFinancieraCmd.js';
 import { listFinancialCat, createFinancialCat, updateFinancialCat, deleteFinancialCat } from './commands/categoriaFinancieraCmd.js';
 import { listClient, getById, getByName, createClient, updateClient, deleteClient } from './commands/clienteCmd.js';
 import { listWorkoutPlan, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } from './commands/planEntrenamientoCmd.js';
@@ -100,6 +100,30 @@ async function main(){
                                 
                             case 'Eliminar registros':
                                 await deleteWorkoutPlan();
+                                break;
+
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
+                        }
+                        break;
+
+                    case 'GESTIÓN FINANCIERA':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listFinancialRecord();
+                                break;
+
+                            case 'Crear registros':
+                                await createFinancialRecord();
+                                break;
+
+                            case 'Actualizar registros':
+                                await updateFinancialRecord();
+                                break;
+
+                            case 'Eliminar registros':
+                                await deleteFinancialRecord();
                                 break;
 
                             default:

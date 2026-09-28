@@ -11,6 +11,7 @@ export class ClientePlanEntrenamientoService {
                 CONCAT(c.nombre, ' ', c.apellido) AS cliente,
                 cp.id_plan,
                 p.nombre_plan AS plan,
+                p.duracion_dias,
                 cp.fecha_inicio,
                 cp.fecha_fin,
                 cp.estado,
@@ -25,6 +26,29 @@ export class ClientePlanEntrenamientoService {
     }
 
     static async getById(id) {
+        const db = await connection();
+        const query = `
+            SELECT 
+                cp.id_cliente_plan,
+                cp.id_cliente,
+                CONCAT(c.nombre, ' ', c.apellido) AS cliente,
+                cp.id_plan,
+                p.nombre_plan AS plan,
+                p.duracion_dias,
+                cp.fecha_inicio,
+                cp.fecha_fin,
+                cp.estado,
+                cp.fecha_asigncion
+            FROM cliente_plan_entrenamiento cp
+            LEFT JOIN clientes c ON cp.id_cliente = c.id_cliente
+            LEFT JOIN plan_entrenamiento p ON cp.id_plan = p.id_plan
+            WHERE cp.id_cliente_plan = ?
+        `;
+        const [ rows ] = await db.query(query, [id]);
+        return rows;
+    }
+
+    static async getClientById(id) {
         const db = await connection();
         const [ rows ] = await db.query('SELECT * FROM clientes WHERE id_cliente = ?', [id]);
         return rows;
@@ -41,39 +65,28 @@ export class ClientePlanEntrenamientoService {
         return rows;
     }
 
-    static async create(newPlan, planDetails){
+    static async create(newPlan){
         const db = await connection();
-        try {
-            await db.beginTransaction();
+        const query = 'INSERT INTO cliente_plan_entrenamiento (id_cliente, id_plan, fecha_inicio, fecha_fin, estado) VALUES (?, ?, ?, ?, ?)';
+        const [ result ] = await db.execute(query, [
+            newPlan.id_cliente,
+            newPlan.id_plan,
+            newPlan.fecha_inicio,
+            newPlan.fecha_fin,
+            newPlan.estado
+        ]);
+        return result;
+    }
 
-            const queryPlan = 'INSERT INTO cliente_plan_entrenamiento (id_cliente, id_plan, fecha_inicio, fecha_fin, estado) VALUES (?, ?, ?, ?, ?)';
-            const [ resultPlan ] = await db.execute(queryPlan, [
-                newPlan.id_cliente,
-                newPlan.id_plan,
-                newPlan.fecha_inicio,
-                newPlan.fecha_fin,
-                newPlan.estado || 'activo'
-            ]);
-
-            const id_cliente_plan = resultPlan.insertId;
-
-            const queryContrato = 'INSERT INTO contrato (id_cliente_plan, condiciones, duracion_dias, precio, fecha_inicio, fecha_fin) VALUES (?, ?, ?, ?, ?, ?)';
-            const condiciones = 'Contrato de adhesión al plan de entrenamiento Hydra Gym. Cumplimiento obligatorio del reglamento interno.';
-            
-            await db.execute(queryContrato, [
-                id_cliente_plan,
-                condiciones,
-                planDetails.duracion_dias,
-                planDetails.precio,
-                newPlan.fecha_inicio,
-                newPlan.fecha_fin
-            ]);
-
-            await db.commit();
-            return resultPlan;
-        } catch (err) {
-            await db.rollback();
-            throw err;
-        }
+    static async update(id, updatedPlan) {
+        const db = await connection();
+        const query = 'UPDATE cliente_plan_entrenamiento SET fecha_inicio = ?, fecha_fin = ?, estado = ? WHERE id_cliente_plan = ?';
+        const [ result ] = await db.execute(query, [
+            updatedPlan.fecha_inicio,
+            updatedPlan.fecha_fin,
+            updatedPlan.estado,
+            id
+        ]);
+        return result;
     }
 }

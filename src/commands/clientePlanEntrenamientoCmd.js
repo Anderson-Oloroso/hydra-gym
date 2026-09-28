@@ -65,7 +65,7 @@ export async function createClientPlan(){
             }
         });
 
-        const existsClient = await ClientePlanEntrenamientoService.getById(id);
+        const existsClient = await ClientePlanEntrenamientoService.getClientById(id);
         if (!existsClient || existsClient.length === 0) {
             console.log(chalk.yellow(`No se encontró ningún cliente con el ID: ${id}`));
             return;
@@ -122,8 +122,79 @@ export async function createClientPlan(){
             estado: 'activo'
         });
 
-        const result = await ClientePlanEntrenamientoService.create(newClientPlan, plan);
-        console.log(chalk.green.bold(`Asignación de plan y contrato creados exitosamente con ID: ${result.insertId}`));
+        const result = await ClientePlanEntrenamientoService.create(newClientPlan);
+        console.log(chalk.green.bold(`Asignación de plan de entrenamiento creada exitosamente con ID: ${result.insertId}`));
+    }
+    catch(err){
+        problem(err);
+    }
+}
+
+export async function updateClientPlan(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID de la asignación a actualizar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsRecord = await ClientePlanEntrenamientoService.getById(id);
+        if (!existsRecord || existsRecord.length === 0) {
+            console.log(chalk.yellow(`No se encontró ninguna asignación con el ID: ${id}`));
+            return;
+        }
+
+        const currentAssignment = existsRecord[0];
+        console.log(chalk.cyan('Datos actuales de la asignación ...'));
+        console.table(formatClientPlans([currentAssignment]));
+
+        const rawDate = currentAssignment.fecha_inicio ? new Date(currentAssignment.fecha_inicio) : new Date();
+        const initialDate = `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, '0')}-${String(rawDate.getDate()).padStart(2, '0')}`;
+
+        const { fecha_inicio } = await Enquirer.prompt({
+            type: 'input',
+            name: 'fecha_inicio',
+            message: 'Fecha de Inicio (YYYY-MM-DD): ',
+            initial: initialDate,
+            validate(val) {
+                const d = new Date(val + 'T00:00:00');
+                return !isNaN(d.getTime()) && val.trim() !== '' ? true : 'Debe ingresar una fecha válida en formato YYYY-MM-DD.';
+            }
+        });
+
+        const estadoPrompt = new Enquirer.Select({
+            name: 'estado',
+            message: 'Seleccione el nuevo estado del plan:',
+            choices: [
+                { name: 'activo', message: 'activo', value: 'activo' },
+                { name: 'pendiente', message: 'pendiente', value: 'pendiente' },
+                { name: 'completado', message: 'completado', value: 'completado' },
+                { name: 'cancelado', message: 'cancelado', value: 'cancelado' }
+            ],
+            initial: currentAssignment.estado || 'activo'
+        });
+
+        const estadoSeleccionado = await estadoPrompt.run();
+
+        const startDate = new Date(fecha_inicio.trim() + 'T00:00:00');
+        startDate.setDate(startDate.getDate() + Number(currentAssignment.duracion_dias));
+        const yyyy = startDate.getFullYear();
+        const mm = String(startDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(startDate.getDate()).padStart(2, '0');
+        const fecha_fin = `${yyyy}-${mm}-${dd}`;
+
+        console.log(chalk.cyan(`Fecha fin recalculada automáticamente (+${currentAssignment.duracion_dias} días): ${fecha_fin}`));
+
+        await ClientePlanEntrenamientoService.update(id, {
+            fecha_inicio: fecha_inicio.trim(),
+            fecha_fin: fecha_fin,
+            estado: estadoSeleccionado
+        });
+
+        console.log(chalk.green.bold(`Asignación con ID ${id} actualizada correctamente.`));
     }
     catch(err){
         problem(err);

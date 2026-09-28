@@ -146,3 +146,123 @@ export async function createFinancialRecord(){
         problem(err);
     }
 }
+
+export async function updateFinancialRecord(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del movimiento financiero a actualizar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsRecord = await GestionFinancieraService.getById(id);
+        if (!existsRecord || existsRecord.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún registro financiero con el ID: ${id}`));
+            return;
+        }
+
+        const currentFinancialRecord = existsRecord[0];
+        console.log(chalk.cyan('Datos actuales del movimiento financiero ...'));
+        console.table(formatFinancialRecords([currentFinancialRecord]));
+
+        const categorias = await GestionFinancieraService.getCategories();
+        if (!categorias || categorias.length === 0) {
+            console.log(chalk.red('No se encontraron categorías financieras en la base de datos.'));
+            return;
+        }
+
+        const categoriaActual = categorias.find(c => c.id_categoria === currentFinancialRecord.id_categoria);
+
+        const categoriaPrompt = new Enquirer.Select({
+            name: 'categoria',
+            message: 'Seleccione la categoría financiera:',
+            choices: categorias.map(c => ({
+                name: `${c.id_categoria}`,
+                message: `${c.id_categoria}. ${c.nombre} [${c.tipo.toUpperCase()}]`,
+                value: c.id_categoria
+            })),
+            initial: categoriaActual ? `${categoriaActual.id_categoria}` : undefined
+        });
+
+        const idCategoriaSeleccionada = await categoriaPrompt.run();
+        const categoriaEncontrada = categorias.find(c => c.id_categoria === Number(idCategoriaSeleccionada));
+
+        if (!categoriaEncontrada) {
+            console.log(chalk.red('Categoría no válida.'));
+            return;
+        }
+
+        const id_categoria = Number(categoriaEncontrada.id_categoria);
+        let id_cliente = null;
+
+        if (categoriaEncontrada.tipo === 'ingreso') {
+            const clientes = await ClientService.list();
+            if (!clientes || clientes.length === 0) {
+                console.log(chalk.red('No hay clientes registrados en el sistema. Los ingresos requieren obligatoriamente un cliente.'));
+                return;
+            }
+
+            const clienteActual = clientes.find(c => c.id_cliente === currentFinancialRecord.id_cliente);
+
+            const clientePrompt = new Enquirer.Select({
+                name: 'cliente',
+                message: 'Seleccione el cliente asociado al ingreso (obligatorio):',
+                choices: clientes.map(c => ({
+                    name: `${c.id_cliente}`,
+                    message: `${c.id_cliente}. ${c.nombre} ${c.apellido} (DPI: ${c.dpi})`,
+                    value: c.id_cliente
+                })),
+                initial: clienteActual ? `${clienteActual.id_cliente}` : undefined
+            });
+
+            const idClienteSeleccionado = await clientePrompt.run();
+            const clienteEncontrado = clientes.find(c => c.id_cliente === Number(idClienteSeleccionado));
+
+            if (!clienteEncontrado) {
+                console.log(chalk.red('Debe seleccionar un cliente válido para un ingreso.'));
+                return;
+            }
+
+            id_cliente = Number(clienteEncontrado.id_cliente);
+        } else {
+            id_cliente = null;
+        }
+
+        const prompt = new Enquirer.Form({
+            name: 'financialRecord',
+            message: 'Modifique lo que sea necesario:',
+            choices: [
+                { name: 'monto', message: 'Monto:', initial: String(currentFinancialRecord.monto) },
+                { name: 'descripcion', message: 'Descripción:', initial: currentFinancialRecord.descripcion || '' }
+            ]
+        });
+
+        const answers = await prompt.run();
+
+        if (!answers.monto.trim() || !answers.descripcion.trim()) {
+            console.log(chalk.red('Monto y Descripción son obligatorios.'));
+            return;
+        }
+
+        if (isNaN(answers.monto) || parseFloat(answers.monto) <= 0) {
+            console.log(chalk.red('El monto debe ser un valor numérico positivo mayor a cero.'));
+            return;
+        }
+
+        const updatedFinancialRecord = EntityFactory.create('gestion_financiera', {
+            id_categoria: id_categoria,
+            id_cliente: id_cliente,
+            monto: parseFloat(answers.monto.trim()),
+            descripcion: answers.descripcion.trim()
+        });
+
+        await GestionFinancieraService.update(id, updatedFinancialRecord);
+        console.log(chalk.green.bold(`Registro financiero con ID ${id} actualizado correctamente.`));
+    }
+    catch(err){
+        problem(err);
+    }
+}

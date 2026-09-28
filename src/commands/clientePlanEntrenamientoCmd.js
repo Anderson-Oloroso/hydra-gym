@@ -200,3 +200,43 @@ export async function updateClientPlan(){
         problem(err);
     }
 }
+
+export async function deleteClientPlan(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del cliente a buscar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+        const existsClient = await ClientePlanEntrenamientoService.getClientById(id);
+        if (!existsClient || existsClient.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún cliente con el ID: ${id}`));
+            return;
+        }
+
+        console.log(chalk.cyan('Datos del cliente y su plan de entrenmiento ...'));
+        console.table([existsClient[0]]);
+
+        const answer = await new Enquirer.Confirm({
+            name: 'confirmacion',
+            message: '¿Confirmar eliminación?',
+            initial: false
+        }).run();
+
+        if (answer) {
+            console.log(chalk.red(`Eliminando registro con ID ${id} ...`));
+            await ClientePlanEntrenamientoService.delete(id);
+
+            console.log(chalk.green.bold(`Cliente - plan de entrenamiento con ID ${id} eliminado exitosamente.`));
+        } else {
+            console.log(chalk.blue('Eliminación cancelada'));
+        }
+    }
+    catch(err){
+        problem(err);
+    }
+
+}

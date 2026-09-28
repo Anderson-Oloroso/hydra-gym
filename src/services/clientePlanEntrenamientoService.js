@@ -89,4 +89,11 @@ export class ClientePlanEntrenamientoService {
         ]);
         return result;
     }
+
+    static async delete(id){
+        const db = await connection();
+        const query = 'DELETE FROM cliente_plan_entrenamiento WHERE id_cliente = ?';
+        const [ result ] = await db.execute(query,[id]);
+        return result;
+    }
 }

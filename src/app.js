@@ -3,7 +3,7 @@ import { listFinancialRecord, createFinancialRecord, updateFinancialRecord, dele
 import { listFinancialCat, createFinancialCat, updateFinancialCat, deleteFinancialCat } from './commands/categoriaFinancieraCmd.js';
 import { listClient, getById, getByName, createClient, updateClient, deleteClient } from './commands/clienteCmd.js';
 import { listWorkoutPlan, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } from './commands/planEntrenamientoCmd.js';
-import { listClientPlan, createClientPlan, updateClientPlan } from './commands/clientePlanEntrenamientoCmd.js';
+import { listClientPlan, createClientPlan, updateClientPlan, deleteClientPlan } from './commands/clientePlanEntrenamientoCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
@@ -147,6 +147,10 @@ async function main(){
                                 await updateClientPlan();
                                 break;
 
+                            case 'Eliminar registros':
+                                await deleteClientPlan();
+                                break;
+                                
                             default:
                                 console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
                                 break;

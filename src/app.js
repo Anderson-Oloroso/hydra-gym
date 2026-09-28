@@ -4,6 +4,7 @@ import { listFinancialCat, createFinancialCat, updateFinancialCat, deleteFinanci
 import { listClient, getById, getByName, createClient, updateClient, deleteClient } from './commands/clienteCmd.js';
 import { listWorkoutPlan, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } from './commands/planEntrenamientoCmd.js';
 import { listClientPlan, createClientPlan, updateClientPlan, deleteClientPlan } from './commands/clientePlanEntrenamientoCmd.js';
+import { listNutritionPlan } from './commands/planNutricionCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
@@ -151,6 +152,18 @@ async function main(){
                                 await deleteClientPlan();
                                 break;
                                 
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
+                        }
+                        break;
+
+                    case 'PLANES DE NUTRICION':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listNutritionPlan();
+                                break;
+
                             default:
                                 console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
                                 break;

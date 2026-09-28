@@ -1,5 +1,6 @@
 import { mainMenu, submenu, pause, clearScreen } from './utils/menu.js';
-import { listClient, getById, getByName, createClient, updateClient, deleteClient} from './commands/clienteCmd.js';
+import { listClient, getById, getByName, createClient, updateClient, deleteClient } from './commands/clienteCmd.js';
+import { listWorkoutPlan, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } from './commands/planEntrenamientoCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
@@ -56,6 +57,30 @@ async function main(){
                                 console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
                                 break;
 
+                        }
+                        break;
+
+                    case 'PLANES DE ENTRENAMIENTO':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listWorkoutPlan();
+                                break;
+
+                            case 'Crear registros':
+                                await createWorkoutPlan();
+                                break;
+
+                            case 'Actualizar registros':
+                                await updateWorkoutPlan();
+                                break;
+                                
+                            case 'Eliminar registros':
+                                await deleteWorkoutPlan();
+                                break;
+
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
                         }
                         break;
 

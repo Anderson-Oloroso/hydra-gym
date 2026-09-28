@@ -1,6 +1,8 @@
 import { mainMenu, submenu, pause, clearScreen } from './utils/menu.js';
-import { listClient, getById, getByName, createClient, updateClient, deleteClient} from './commands/clienteCmd.js';
 import { listFinancialRecord, createFinancialRecord, updateFinancialRecord, deleteFinancialRecord } from './commands/gestionFinancieraCmd.js';
+import { listFinancialCat, createFinancialCat, updateFinancialCat, deleteFinancialCat } from './commands/categoriaFinancieraCmd.js';
+import { listClient, getById, getByName, createClient, updateClient, deleteClient } from './commands/clienteCmd.js';
+import { listWorkoutPlan, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } from './commands/planEntrenamientoCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
@@ -56,7 +58,53 @@ async function main(){
                             default:
                                 console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
                                 break;
+                        }
+                        break;
 
+                        case 'CATEGORIAS FINANCIERAS':
+                            switch(selectedAction){
+                                case 'Listar registros':
+                                    await listFinancialCat();
+                                    break;
+
+                                case 'Crear registros':
+                                    await createFinancialCat();
+                                    break;
+
+                                case 'Actualizar registros':
+                                    await updateFinancialCat();
+                                    break;
+
+                                case 'Eliminar registros':
+                                    await deleteFinancialCat();
+                                    break;
+
+                                default:
+                                    console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                    break;
+                            }
+                            break;
+                    case 'PLANES DE ENTRENAMIENTO':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listWorkoutPlan();
+                                break;
+
+                            case 'Crear registros':
+                                await createWorkoutPlan();
+                                break;
+
+                            case 'Actualizar registros':
+                                await updateWorkoutPlan();
+                                break;
+                                
+                            case 'Eliminar registros':
+                                await deleteWorkoutPlan();
+                                break;
+
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
                         }
                         break;
 

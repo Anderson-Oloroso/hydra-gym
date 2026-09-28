@@ -98,4 +98,11 @@ export class DetalleComidaService {
         ]);
         return result;
     }
+
+    static async delete(id) {
+        const db = await connection();
+        const query = 'DELETE FROM detalle_comida_diaria WHERE id_comida = ?';
+        const [ row ] = await db.execute(query, [id]);
+        return row;
+    }
 }

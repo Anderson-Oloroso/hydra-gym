@@ -231,3 +231,42 @@ export async function updateMealDetail(){
         problem(err);
     }
 }
+
+export async function deleteMealDetail(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del detalle de comida a eliminar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsRecord = await DetalleComidaService.getById(id);
+        if (!existsRecord || existsRecord.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún detalle de comida con el ID: ${id}`));
+            return;
+        }
+
+        console.log(chalk.cyan('Datos del detalle de comida a eliminar:'));
+        console.table(formatMealDetail([existsRecord[0]]));
+
+        const answer = await new Enquirer.Confirm({
+            name: 'confirmacion',
+            message: '¿Confirmar eliminación?',
+            initial: false
+        }).run();
+
+        if (answer) {
+            console.log(chalk.red(`Eliminando detalle de comida con ID ${id} ...`));
+            await DetalleComidaService.delete(id);
+            console.log(chalk.green.bold(`Detalle de comida con ID ${id} eliminado exitosamente.`));
+        } else {
+            console.log(chalk.blue('Eliminación cancelada'));
+        }
+    }
+    catch(err){
+        problem(err);
+    }
+}

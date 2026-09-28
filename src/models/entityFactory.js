@@ -6,6 +6,7 @@ import { PlanNutricion } from './planNutricion.js';
 import { DetalleComida } from './detalleComida.js';
 import { SeguimientoFisico } from './seguimientoFisico.js';
 import { GestionFinanciera } from './gestionFinanciera.js';
+import { Contrato } from './contrato.js';
 
 export class EntityFactory{
     
@@ -69,11 +70,21 @@ export class EntityFactory{
                 return new SeguimientoFisico(
                     data.id_cliente_plan,
                     data.semana,
+                    data.fecha_registro,
                     data.peso_kg,
                     data.grasa_corporal,
                     data.altura_cm,
                     data.fotos,
                     data.comentarios
+                );
+            case 'contrato':
+                return new Contrato(
+                    data.id_cliente_plan,
+                    data.condiciones,
+                    data.duracion_dias,
+                    data.precio,
+                    data.fecha_inicio,
+                    data.fecha_fin
                 );
             default:
                 throw new Error(`[ EntityError ] -> Tipo de identidad no reconocida: ${entityType}`);

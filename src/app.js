@@ -1,9 +1,10 @@
 import { mainMenu, submenu, pause, clearScreen } from './utils/menu.js';
-import { listFinancialRecord, createFinancialRecord, updateFinancialRecord, deleteFinancialRecord } from './commands/gestionFinancieraCmd.js';
+import { listFinancialRecord, createFinancialRecord, updateFinancialRecord, deleteFinancialRecord, showFinancialBalance } from './commands/gestionFinancieraCmd.js';
 import { listFinancialCat, createFinancialCat, updateFinancialCat, deleteFinancialCat } from './commands/categoriaFinancieraCmd.js';
 import { listClient, getById, getByName, createClient, updateClient, deleteClient } from './commands/clienteCmd.js';
 import { listWorkoutPlan, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } from './commands/planEntrenamientoCmd.js';
 import { listClientPlan, createClientPlan, updateClientPlan, deleteClientPlan } from './commands/clientePlanEntrenamientoCmd.js';
+import { listContract, updateContract } from './commands/contratoCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
@@ -127,6 +128,10 @@ async function main(){
                                 await deleteFinancialRecord();
                                 break;
 
+                            case 'Ver balance financiero (general y por categorías)':
+                                await showFinancialBalance();
+                                break;
+
                             default:
                                 console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
                                 break;
@@ -151,6 +156,22 @@ async function main(){
                                 await deleteClientPlan();
                                 break;
                                 
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
+                        }
+                        break;
+
+                    case 'CONTRATOS':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listContract();
+                                break;
+
+                            case 'Actualizar registros':
+                                await updateContract();
+                                break;
+
                             default:
                                 console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
                                 break;

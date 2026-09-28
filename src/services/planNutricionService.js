@@ -85,4 +85,11 @@ export class PlanNutricionService {
         ]);
         return result;
     }
+
+    static async delete(id) {
+        const db = await connection();
+        const query = 'DELETE FROM plan_nutricion WHERE id_plan_nutricion = ?';
+        const [ row ] = await db.execute(query, [id]);
+        return row;
+    }
 }

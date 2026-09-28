@@ -142,3 +142,42 @@ export async function updateNutritionPlan(){
         problem(err);
     }
 }
+
+export async function deleteNutritionPlan(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del plan de nutrición a eliminar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsRecord = await PlanNutricionService.getById(id);
+        if (!existsRecord || existsRecord.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún plan de nutrición con el ID: ${id}`));
+            return;
+        }
+
+        console.log(chalk.cyan('Datos del plan de nutrición a eliminar:'));
+        console.table(formatNutritionPlan([existsRecord[0]]));
+
+        const answer = await new Enquirer.Confirm({
+            name: 'confirmacion',
+            message: '¿Confirmar eliminación?',
+            initial: false
+        }).run();
+
+        if (answer) {
+            console.log(chalk.red(`Eliminando plan de nutrición con ID ${id} ...`));
+            await PlanNutricionService.delete(id);
+            console.log(chalk.green.bold(`Plan de nutrición con ID ${id} eliminado exitosamente.`));
+        } else {
+            console.log(chalk.blue('Eliminación cancelada'));
+        }
+    }
+    catch(err){
+        problem(err);
+    }
+}

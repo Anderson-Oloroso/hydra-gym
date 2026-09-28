@@ -259,3 +259,50 @@ export async function updatePhysicalTracking(){
         problem(err);
     }
 }
+
+export async function deletePhysicalTracking(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del registro de seguimiento físico a eliminar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsRecord = await SeguimientoFisicoService.getById(id);
+        if (!existsRecord || existsRecord.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún registro de seguimiento físico con el ID: ${id}`));
+            return;
+        }
+
+        const current = existsRecord[0];
+        const formatted = formatPhysicalTracking(current);
+
+        console.log(chalk.cyan(`\nDatos del seguimiento físico a eliminar (ID: ${current.id_seguimiento}):`));
+        console.table(
+            Object.entries(formatted).map(([campo, valor]) => ({
+                campo,
+                valor: valor ?? 'N/A'
+            }))
+        );
+
+        const answer = await new Enquirer.Confirm({
+            name: 'confirmacion',
+            message: '¿Confirmar eliminación?',
+            initial: false
+        }).run();
+
+        if (answer) {
+            console.log(chalk.red(`Eliminando registro con ID ${id} ...`));
+            await SeguimientoFisicoService.delete(id);
+            console.log(chalk.green.bold(`Registro de seguimiento físico con ID ${id} eliminado exitosamente.`));
+        } else {
+            console.log(chalk.blue('Eliminación cancelada'));
+        }
+    }
+    catch(err){
+        problem(err);
+    }
+}

@@ -111,4 +111,11 @@ export class SeguimientoFisicoService {
         ]);
         return result;
     }
+
+    static async delete(id) {
+        const db = await connection();
+        const query = 'DELETE FROM seguimiento_fisico WHERE id_seguimiento = ?';
+        const [ row ] = await db.execute(query, [id]);
+        return row;
+    }
 }

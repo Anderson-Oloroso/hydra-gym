@@ -4,7 +4,7 @@ import { listFinancialCat, createFinancialCat, updateFinancialCat, deleteFinanci
 import { listClient, getById, getByName, createClient, updateClient, deleteClient } from './commands/clienteCmd.js';
 import { listWorkoutPlan, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } from './commands/planEntrenamientoCmd.js';
 import { listClientPlan, createClientPlan, updateClientPlan, deleteClientPlan } from './commands/clientePlanEntrenamientoCmd.js';
-import { listNutritionPlan } from './commands/planNutricionCmd.js';
+import { listNutritionPlan, createNutritionPlan } from './commands/planNutricionCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
@@ -162,6 +162,10 @@ async function main(){
                         switch (selectedAction) {
                             case 'Listar registros':
                                 await listNutritionPlan();
+                                break;
+
+                            case 'Crear registros':
+                                await createNutritionPlan();
                                 break;
 
                             default:

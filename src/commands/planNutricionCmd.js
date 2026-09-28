@@ -1,4 +1,6 @@
+import Enquirer from "enquirer";
 import chalk from "chalk";
+import { EntityFactory } from "../models/entityFactory.js";
 import { PlanNutricionService } from "../services/planNutricionService.js";
 
 function problem(err){
@@ -33,6 +35,60 @@ export async function listNutritionPlan(){
 
         console.table(formatNutritionPlan(records));
     } catch (err) {
+        problem(err);
+    }
+}
+
+export async function createNutritionPlan(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID de la asignación cliente - plan de entrenamiento: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsClientPlan = await PlanNutricionService.getClientPlanById(id);
+        if (!existsClientPlan || existsClientPlan.length === 0) {
+            console.log(chalk.yellow(`No se encontró ninguna asignación con el ID: ${id}`));
+            return;
+        }
+
+        const clientPlan = existsClientPlan[0];
+        if (clientPlan.estado !== 'activo') {
+            console.log(chalk.yellow(`No se puede crear un plan de nutrición. La asignación con ID ${id} se encuentra en estado "${clientPlan.estado}" y debe estar "activo".`));
+            return;
+        }
+
+        console.log(chalk.cyan(`Asignación seleccionada: Cliente: ${clientPlan.cliente} | Plan: ${clientPlan.plan} | Estado: ${clientPlan.estado}`));
+
+        const { nombre } = await Enquirer.prompt({
+            type: 'input',
+            name: 'nombre',
+            message: 'Nombre del plan de nutrición: ',
+            validate(val) {
+                return val.trim() !== '' ? true : 'El nombre del plan de nutrición no puede estar vacío.';
+            }
+        });
+
+        const { descripcion } = await Enquirer.prompt({
+            type: 'input',
+            name: 'descripcion',
+            message: 'Descripción del plan de nutrición (opcional, presione enter para omitir): '
+        });
+
+        const newNutritionPlan = EntityFactory.create('plan_nutricion', {
+            id_cliente_plan: Number(id),
+            nombre: nombre.trim(),
+            descripcion: descripcion.trim() !== '' ? descripcion.trim() : null
+        });
+
+        const result = await PlanNutricionService.create(newNutritionPlan);
+        console.log(chalk.green.bold(`Plan de nutrición creado exitosamente con ID: ${result.insertId}`));
+    }
+    catch(err){
         problem(err);
     }
 }

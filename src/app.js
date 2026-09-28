@@ -3,6 +3,7 @@ import { listFinancialRecord, createFinancialRecord, updateFinancialRecord, dele
 import { listFinancialCat, createFinancialCat, updateFinancialCat, deleteFinancialCat } from './commands/categoriaFinancieraCmd.js';
 import { listClient, getById, getByName, createClient, updateClient, deleteClient } from './commands/clienteCmd.js';
 import { listWorkoutPlan, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } from './commands/planEntrenamientoCmd.js';
+import { listClientPlan } from './commands/clientePlanEntrenamientoCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
@@ -108,7 +109,7 @@ async function main(){
                         }
                         break;
 
-                    case 'GESTIÓN FINANCIERA':
+                    case 'GESTION FINANCIERA':
                         switch (selectedAction) {
                             case 'Listar registros':
                                 await listFinancialRecord();
@@ -124,6 +125,18 @@ async function main(){
 
                             case 'Eliminar registros':
                                 await deleteFinancialRecord();
+                                break;
+
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
+                        }
+                        break;
+
+                    case 'CLIENTE - PLAN DE ENTRENAMIENTO':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listClientPlan();
                                 break;
 
                             default:

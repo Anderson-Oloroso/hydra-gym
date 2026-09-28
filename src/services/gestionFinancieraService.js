@@ -71,6 +71,13 @@ export class GestionFinancieraService {
         return result;
     }
 
+    static async delete(id) {
+        const db = await connection();
+        const query = 'DELETE FROM gestion_financiera WHERE id_gestion = ?';
+        const [ row ] = await db.execute(query, [id]);
+        return row;
+    }
+
     static async getCategories() {
         const db = await connection();
         const [ rows ] = await db.query('SELECT * FROM categoria_financiera');

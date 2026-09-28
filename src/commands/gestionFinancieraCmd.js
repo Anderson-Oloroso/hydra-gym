@@ -266,3 +266,42 @@ export async function updateFinancialRecord(){
         problem(err);
     }
 }
+
+export async function deleteFinancialRecord(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del movimiento financiero a eliminar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsRecord = await GestionFinancieraService.getById(id);
+        if (!existsRecord || existsRecord.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún registro financiero con el ID: ${id}`));
+            return;
+        }
+
+        const currentFinancialRecord = existsRecord[0];
+        console.log(chalk.cyan('Datos del movimiento financiero ...'));
+        console.table(formatFinancialRecords([currentFinancialRecord]));
+
+        const answer = await new Enquirer.Confirm({
+            name: 'confirmacion',
+            message: '¿Confirmar eliminación?',
+            initial: false
+        }).run();
+
+        if (answer) {
+            console.log(chalk.red(`Eliminando registro financiero con ID ${id} ...`));
+            await GestionFinancieraService.delete(id);
+            console.log(chalk.green.bold(`Registro financiero con ID ${id} eliminado exitosamente.`));
+        } else {
+            console.log(chalk.blue('Eliminación cancelada'));
+        }
+    } catch(err){
+        problem(err);
+    }
+}

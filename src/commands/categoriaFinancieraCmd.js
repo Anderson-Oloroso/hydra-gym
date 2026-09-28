@@ -143,6 +143,14 @@ export async function deleteFinancialCat() {
         console.log(chalk.cyan('Datos de la categoría financiera...'));
         console.table([existsCategory[0]]);
 
+        const hasRelations = await FinancialCatService.hasRelations(id);
+        if (hasRelations) {
+            console.log(chalk.red.bold('\n[ INTEGRIDAD REFERENCIAL ]'));
+            console.log(chalk.yellow(`No se puede eliminar la categoría con ID ${id} porque tiene movimientos o registros asociados en 'gestion_financiera'.`));
+            console.log(chalk.gray('Para eliminar esta categoría, primero debe reasignar o eliminar los registros financieros correspondientes.\n'));
+            return;
+        }
+
         const answer = await new Enquirer.Confirm({
             name: 'confirmacion',
             message: '¿Confirmar eliminación?',

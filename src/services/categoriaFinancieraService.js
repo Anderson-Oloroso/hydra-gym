@@ -39,6 +39,15 @@ export class FinancialCatService{
         return result;
     }  
 
+    static async hasRelations(id) {
+        const db = await connection();
+        const [ rows ] = await db.query(
+            'SELECT COUNT(*) AS total FROM gestion_financiera WHERE id_categoria = ?',
+            [id]
+        );
+        return rows[0].total > 0;
+    }
+
     static async delete(id){
         const db = await connection();
         const query = 'DELETE FROM categoria_financiera WHERE id_categoria = ?';

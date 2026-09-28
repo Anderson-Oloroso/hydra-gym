@@ -66,29 +66,30 @@ async function main(){
                         }
                         break;
 
-                        case 'CATEGORIAS FINANCIERAS':
-                            switch(selectedAction){
-                                case 'Listar registros':
-                                    await listFinancialCat();
-                                    break;
+                    case 'CATEGORIAS FINANCIERAS':
+                        switch(selectedAction){
+                            case 'Listar registros':
+                                await listFinancialCat();
+                                break;
 
-                                case 'Crear registros':
-                                    await createFinancialCat();
-                                    break;
+                            case 'Crear registros':
+                                await createFinancialCat();
+                                break;
 
-                                case 'Actualizar registros':
-                                    await updateFinancialCat();
-                                    break;
+                            case 'Actualizar registros':
+                                await updateFinancialCat();
+                                break;
 
-                                case 'Eliminar registros':
-                                    await deleteFinancialCat();
-                                    break;
+                            case 'Eliminar registros':
+                                await deleteFinancialCat();
+                                break;
 
-                                default:
-                                    console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
-                                    break;
-                            }
-                            break;
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
+                        }
+                        break;
+
                     case 'PLANES DE ENTRENAMIENTO':
                         switch (selectedAction) {
                             case 'Listar registros':
@@ -181,6 +182,14 @@ async function main(){
 
                             case 'Eliminar registros':
                                 await deleteNutritionPlan();
+                                break;
+
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
+                        }
+                        break;
+
                     case 'SEGUIMIENTO FISICO':
                         switch (selectedAction) {
                             case 'Listar registros':
@@ -197,8 +206,14 @@ async function main(){
 
                             case 'Eliminar registros':
                                 await deletePhysicalTracking();
-                                
                                 break;
+
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
+                        }
+                        break;
+
                     case 'DETALLE DE COMIDA DIARIA':
                         switch (selectedAction) {
                             case 'Listar registros':
@@ -215,6 +230,14 @@ async function main(){
 
                             case 'Eliminar registros':
                                 await deleteMealDetail();
+                                break;
+
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
+                        }
+                        break;
+
                     case 'CONTRATOS':
                         switch (selectedAction) {
                             case 'Listar registros':

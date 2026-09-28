@@ -320,11 +320,16 @@ export async function showFinancialBalance(){
             {
                 'Total Ingresos': `Q${totalIngresos.toFixed(2)}`,
                 'Total Egresos': `Q${totalEgresos.toFixed(2)}`,
-                'Balance Neto': balanceNeto >= 0 ? chalk.green(`+Q${balanceNeto.toFixed(2)}`) : chalk.red(`-Q${Math.abs(balanceNeto).toFixed(2)}`)
+                'Balance Neto': balanceNeto >= 0 ? `+Q${balanceNeto.toFixed(2)}` : `-Q${Math.abs(balanceNeto).toFixed(2)}`
             }
         ]);
 
-        console.log(chalk.cyan.bold('\n BALANCE POR CATEGORÍAS \n'));
+        const statusMsg = balanceNeto >= 0 
+            ? chalk.green.bold(`Estado: SUPERÁVIT (+Q${balanceNeto.toFixed(2)})`)
+            : chalk.red.bold(`Estado: DÉFICIT (-Q${Math.abs(balanceNeto).toFixed(2)})`);
+        console.log(`\n${statusMsg}\n`);
+
+        console.log(chalk.cyan.bold('==================== BALANCE POR CATEGORÍAS ===================='));
         if (!byCategory || byCategory.length === 0) {
             console.log(chalk.yellow('No hay movimientos registrados en las categorías.'));
             return;

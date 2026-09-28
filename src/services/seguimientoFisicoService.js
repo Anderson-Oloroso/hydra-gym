@@ -27,6 +27,32 @@ export class SeguimientoFisicoService {
         return rows;
     }
 
+    static async getById(id) {
+        const db = await connection();
+        const query = `
+            SELECT 
+                sf.id_seguimiento,
+                sf.id_cliente_plan,
+                CONCAT(c.nombre, ' ', c.apellido) AS cliente,
+                p.nombre_plan AS plan,
+                cp.estado AS estado_plan,
+                sf.semana,
+                sf.fecha_registro,
+                sf.peso_kg,
+                sf.grasa_corporal,
+                sf.altura_cm,
+                sf.fotos,
+                sf.comentarios
+            FROM seguimiento_fisico sf
+            LEFT JOIN cliente_plan_entrenamiento cp ON sf.id_cliente_plan = cp.id_cliente_plan
+            LEFT JOIN clientes c ON cp.id_cliente = c.id_cliente
+            LEFT JOIN plan_entrenamiento p ON cp.id_plan = p.id_plan
+            WHERE sf.id_seguimiento = ?
+        `;
+        const [ rows ] = await db.query(query, [id]);
+        return rows;
+    }
+
     static async getClientPlanById(id) {
         const db = await connection();
         const query = `
@@ -64,6 +90,24 @@ export class SeguimientoFisicoService {
             record.altura_cm,
             record.fotos,
             record.comentarios
+        ]);
+        return result;
+    }
+
+    static async update(id, record) {
+        const db = await connection();
+        const query = `
+            UPDATE seguimiento_fisico 
+            SET peso_kg = ?, grasa_corporal = ?, altura_cm = ?, fotos = ?, comentarios = ? 
+            WHERE id_seguimiento = ?
+        `;
+        const [ result ] = await db.execute(query, [
+            record.peso_kg,
+            record.grasa_corporal,
+            record.altura_cm,
+            record.fotos,
+            record.comentarios,
+            id
         ]);
         return result;
     }

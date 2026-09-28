@@ -53,7 +53,7 @@ export async function listPhysicalTracking(){
         const data = formatPhysicalTracking(records);
 
         data.forEach((record, index) => {
-            console.log(chalk.cyan(`\n ID: ${index + 1}`));
+            console.log(chalk.cyan(`\n ID: ${record.id_seguimiento}`));
             console.table(
                 Object.entries(record).map(([campo, valor]) => ({
                     campo,
@@ -167,6 +167,93 @@ export async function createPhysicalTracking(){
 
         const result = await SeguimientoFisicoService.create(newTracking);
         console.log(chalk.green.bold(`Seguimiento físico registrado exitosamente con ID: ${result.insertId}`));
+    }
+    catch(err){
+        problem(err);
+    }
+}
+
+export async function updatePhysicalTracking(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del registro de seguimiento a actualizar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsRecord = await SeguimientoFisicoService.getById(id);
+        if (!existsRecord || existsRecord.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún registro de seguimiento con el ID: ${id}`));
+            return;
+        }
+
+        const current = existsRecord[0];
+        const formatted = formatPhysicalTracking(current);
+
+        console.log(chalk.cyan(`\nDatos actuales del seguimiento físico (ID: ${current.id_seguimiento}):`));
+        console.table(
+            Object.entries(formatted).map(([campo, valor]) => ({
+                campo,
+                valor: valor ?? 'N/A'
+            }))
+        );
+
+        const { peso_kg } = await Enquirer.prompt({
+            type: 'input',
+            name: 'peso_kg',
+            message: 'Peso en kg: ',
+            initial: current.peso_kg !== null && current.peso_kg !== undefined ? String(current.peso_kg) : '',
+            validate(val) {
+                return !isNaN(val) && Number(val) > 0 ? true : 'Debe ingresar un peso numérico válido (mayor a 0).';
+            }
+        });
+
+        const { grasa_corporal } = await Enquirer.prompt({
+            type: 'input',
+            name: 'grasa_corporal',
+            message: 'Porcentaje de grasa corporal (% opcional, presione enter para omitir): ',
+            initial: current.grasa_corporal !== null && current.grasa_corporal !== undefined ? String(current.grasa_corporal) : '',
+            validate(val) {
+                return val.trim() === '' || (!isNaN(val) && Number(val) >= 0) ? true : 'Debe ingresar un porcentaje válido o dejarlo vacío.';
+            }
+        });
+
+        const { altura_cm } = await Enquirer.prompt({
+            type: 'input',
+            name: 'altura_cm',
+            message: 'Altura en cm (opcional, presione enter para omitir): ',
+            initial: current.altura_cm !== null && current.altura_cm !== undefined ? String(current.altura_cm) : '',
+            validate(val) {
+                return val.trim() === '' || (!isNaN(val) && Number(val) > 0) ? true : 'Debe ingresar una altura válida o dejarlo vacío.';
+            }
+        });
+
+        const { fotos } = await Enquirer.prompt({
+            type: 'input',
+            name: 'fotos',
+            message: 'URL / Ruta de fotos (opcional, presione enter para omitir): ',
+            initial: current.fotos || ''
+        });
+
+        const { comentarios } = await Enquirer.prompt({
+            type: 'input',
+            name: 'comentarios',
+            message: 'Comentarios / observaciones (opcional, presione enter para omitir): ',
+            initial: current.comentarios || ''
+        });
+
+        await SeguimientoFisicoService.update(id, {
+            peso_kg: parseFloat(peso_kg),
+            grasa_corporal: grasa_corporal.trim() !== '' ? parseFloat(grasa_corporal) : null,
+            altura_cm: altura_cm.trim() !== '' ? parseFloat(altura_cm) : null,
+            fotos: fotos.trim() !== '' ? fotos.trim() : null,
+            comentarios: comentarios.trim() !== '' ? comentarios.trim() : null
+        });
+
+        console.log(chalk.green.bold(`Seguimiento físico con ID ${id} actualizado exitosamente.`));
     }
     catch(err){
         problem(err);

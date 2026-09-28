@@ -24,4 +24,41 @@ export class DetalleComidaService {
         const [ rows ] = await db.query(query);
         return rows;
     }
+
+    static async getNutritionPlanById(id) {
+        const db = await connection();
+        const query = `
+            SELECT 
+                pn.id_plan_nutricion,
+                pn.id_cliente_plan,
+                pn.nombre AS plan_nutricion,
+                CONCAT(c.nombre, ' ', c.apellido) AS cliente,
+                cp.estado AS estado_plan
+            FROM plan_nutricion pn
+            LEFT JOIN cliente_plan_entrenamiento cp ON pn.id_cliente_plan = cp.id_cliente_plan
+            LEFT JOIN clientes c ON cp.id_cliente = c.id_cliente
+            WHERE pn.id_plan_nutricion = ?
+        `;
+        const [ rows ] = await db.query(query, [id]);
+        return rows;
+    }
+
+    static async getMealMoments() {
+        const db = await connection();
+        const [ rows ] = await db.query('SELECT * FROM momento_comida ORDER BY id_momento ASC');
+        return rows;
+    }
+
+    static async create(record) {
+        const db = await connection();
+        const query = 'INSERT INTO detalle_comida_diaria (id_plan_nutricion, id_momento, dia_semana, alimento, calorias_estimadas) VALUES (?, ?, ?, ?, ?)';
+        const [ result ] = await db.execute(query, [
+            record.id_plan_nutricion,
+            record.id_momento,
+            record.dia_semana,
+            record.alimento,
+            record.calorias_estimadas
+        ]);
+        return result;
+    }
 }

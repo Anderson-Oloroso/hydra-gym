@@ -92,3 +92,53 @@ export async function createNutritionPlan(){
         problem(err);
     }
 }
+
+export async function updateNutritionPlan(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del plan de nutrición a actualizar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsRecord = await PlanNutricionService.getById(id);
+        if (!existsRecord || existsRecord.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún plan de nutrición con el ID: ${id}`));
+            return;
+        }
+
+        const current = existsRecord[0];
+        console.log(chalk.cyan('Datos actuales del plan de nutrición:'));
+        console.table(formatNutritionPlan([current]));
+
+        const { nombre } = await Enquirer.prompt({
+            type: 'input',
+            name: 'nombre',
+            message: 'Nombre del plan de nutrición: ',
+            initial: current.nombre_plan_nutricion || '',
+            validate(val) {
+                return val.trim() !== '' ? true : 'El nombre del plan de nutrición no puede estar vacío.';
+            }
+        });
+
+        const { descripcion } = await Enquirer.prompt({
+            type: 'input',
+            name: 'descripcion',
+            message: 'Descripción del plan de nutrición (opcional, presione enter para omitir): ',
+            initial: current.descripcion || ''
+        });
+
+        await PlanNutricionService.update(id, {
+            nombre: nombre.trim(),
+            descripcion: descripcion.trim() !== '' ? descripcion.trim() : null
+        });
+
+        console.log(chalk.green.bold(`Plan de nutrición con ID ${id} actualizado exitosamente.`));
+    }
+    catch(err){
+        problem(err);
+    }
+}

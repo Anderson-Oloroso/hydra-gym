@@ -134,3 +134,100 @@ export async function createMealDetail(){
         problem(err);
     }
 }
+
+export async function updateMealDetail(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID del detalle de comida a actualizar: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsRecord = await DetalleComidaService.getById(id);
+        if (!existsRecord || existsRecord.length === 0) {
+            console.log(chalk.yellow(`No se encontró ningún detalle de comida con el ID: ${id}`));
+            return;
+        }
+
+        const current = existsRecord[0];
+        console.log(chalk.cyan('Datos actuales del detalle de comida:'));
+        console.table(formatMealDetail([current]));
+
+        const momentos = await DetalleComidaService.getMealMoments();
+        if (!momentos || momentos.length === 0) {
+            console.log(chalk.red('No se encontraron momentos de comida registrados en la base de datos.'));
+            return;
+        }
+
+        const momentoPrompt = new Enquirer.Select({
+            name: 'momento',
+            message: 'Seleccione el momento de la comida:',
+            choices: momentos.map(m => ({
+                name: `${m.id_momento}`,
+                message: `${m.id_momento}. ${m.nombre}`,
+                value: m.id_momento
+            })),
+            initial: String(current.id_momento)
+        });
+
+        const idMomento = await momentoPrompt.run();
+
+        const diasSemana = [
+            'lunes',
+            'martes',
+            'miércoles',
+            'jueves',
+            'viernes',
+            'sábado',
+            'domingo'
+        ];
+
+        const diaPrompt = new Enquirer.Select({
+            name: 'dia_semana',
+            message: 'Seleccione el día de la semana:',
+            choices: diasSemana.map(d => ({
+                name: d,
+                message: d.charAt(0).toUpperCase() + d.slice(1),
+                value: d
+            })),
+            initial: current.dia_semana
+        });
+
+        const dia_semana = await diaPrompt.run();
+
+        const { alimento } = await Enquirer.prompt({
+            type: 'input',
+            name: 'alimento',
+            message: 'Alimento / Comida: ',
+            initial: current.alimento || '',
+            validate(val) {
+                return val.trim() !== '' ? true : 'Debe ingresar el alimento.';
+            }
+        });
+
+        const { calorias_estimadas } = await Enquirer.prompt({
+            type: 'input',
+            name: 'calorias_estimadas',
+            message: 'Calorías estimadas (kcal opcional, presione enter para omitir): ',
+            initial: current.calorias_estimadas !== null && current.calorias_estimadas !== undefined ? String(current.calorias_estimadas) : '',
+            validate(val) {
+                return val.trim() === '' || (!isNaN(val) && Number(val) >= 0) ? true : 'Debe ingresar un número válido de calorías o dejarlo vacío.';
+            }
+        });
+
+        await DetalleComidaService.update(id, {
+            id_momento: Number(idMomento),
+            dia_semana: dia_semana,
+            alimento: alimento.trim(),
+            calorias_estimadas: calorias_estimadas.trim() !== '' ? parseInt(calorias_estimadas) : null
+        });
+
+        console.log(chalk.green.bold(`Detalle de comida con ID ${id} actualizado exitosamente.`));
+    }
+    catch(err){
+        problem(err);
+    }
+}

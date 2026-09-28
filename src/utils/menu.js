@@ -9,7 +9,8 @@ const entities = [
   'PLANES DE NUTRICION',
   'DETALLE DE COMIDA DIARIA',
   'SEGUIMIENTO FISICO',
-  'CLIENTE - PLAN DE ENTRENAMIENTO'
+  'CLIENTE - PLAN DE ENTRENAMIENTO',
+  'CONTRATOS'
 ];
 
 
@@ -26,7 +27,7 @@ export async function mainMenu() {
     const prompt = new Enquirer.Select({
     name: 'entity',
     message: 'Elija una opción para gestionar:',
-    limit: 10,
+    limit: 12,
     choices: [
       ...entities.map((ent, i) => ({
         name: ent,
@@ -64,6 +65,16 @@ export async function submenu(entity) {
             'Buscar registro por id',
             'Buscar registro por nombre',
             ...options
+        ];
+    } else if (entity.toLowerCase() === 'gestion financiera') {
+        options = [
+            ...options,
+            'Ver balance financiero (general y por categorías)'
+        ];
+    } else if (entity.toLowerCase() === 'contratos') {
+        options = [
+            'Listar registros',
+            'Actualizar registros'
         ];
     }
 

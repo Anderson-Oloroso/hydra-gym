@@ -305,3 +305,41 @@ export async function deleteFinancialRecord(){
         problem(err);
     }
 }
+
+export async function showFinancialBalance(){
+    try {
+        const general = await GestionFinancieraService.getBalanceGeneral();
+        const byCategory = await GestionFinancieraService.getBalancePorCategorias();
+
+        console.log(chalk.cyan.bold('\n BALANCE FINANCIERO GENERAL \n'));
+        const totalIngresos = Number(general?.total_ingresos || 0);
+        const totalEgresos = Number(general?.total_egresos || 0);
+        const balanceNeto = Number(general?.balance_neto || 0);
+
+        console.table([
+            {
+                'Total Ingresos': `Q${totalIngresos.toFixed(2)}`,
+                'Total Egresos': `Q${totalEgresos.toFixed(2)}`,
+                'Balance Neto': balanceNeto >= 0 ? chalk.green(`+Q${balanceNeto.toFixed(2)}`) : chalk.red(`-Q${Math.abs(balanceNeto).toFixed(2)}`)
+            }
+        ]);
+
+        console.log(chalk.cyan.bold('\n BALANCE POR CATEGORÍAS \n'));
+        if (!byCategory || byCategory.length === 0) {
+            console.log(chalk.yellow('No hay movimientos registrados en las categorías.'));
+            return;
+        }
+
+        const formattedCategories = byCategory.map(c => ({
+            id_categoria: c.id_categoria,
+            categoria: c.categoria,
+            tipo: c.tipo.toUpperCase(),
+            transacciones: c.total_transacciones,
+            total_acumulado: `Q${Number(c.total_monto || 0).toFixed(2)}`
+        }));
+
+        console.table(formattedCategories);
+    } catch (err) {
+        problem(err);
+    }
+}

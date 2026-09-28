@@ -69,6 +69,7 @@ export class EntityFactory{
                 return new SeguimientoFisico(
                     data.id_cliente_plan,
                     data.semana,
+                    data.fecha_registro,
                     data.peso_kg,
                     data.grasa_corporal,
                     data.altura_cm,

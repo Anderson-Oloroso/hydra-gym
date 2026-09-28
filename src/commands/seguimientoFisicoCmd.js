@@ -1,4 +1,6 @@
+import Enquirer from "enquirer";
 import chalk from "chalk";
+import { EntityFactory } from "../models/entityFactory.js";
 import { SeguimientoFisicoService } from "../services/seguimientoFisicoService.js";
 
 function problem(err){
@@ -48,8 +50,125 @@ export async function listPhysicalTracking(){
             return;
         }
 
-        console.table(formatPhysicalTracking(records));
+        const data = formatPhysicalTracking(records);
+
+        data.forEach((record, index) => {
+            console.log(chalk.cyan(`\n ID: ${index + 1}`));
+            console.table(
+                Object.entries(record).map(([campo, valor]) => ({
+                    campo,
+                    valor: valor ?? 'N/A'
+                }))
+            );
+        });
+
     } catch (err) {
+        problem(err);
+    }
+}
+
+export async function createPhysicalTracking(){
+    try{
+        const { id } = await Enquirer.prompt({
+            type: 'input',
+            name: 'id',
+            message: 'Ingresa el ID de la asignación cliente - plan: ',
+            validate(val) {
+                return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
+            }
+        });
+
+        const existsClientPlan = await SeguimientoFisicoService.getClientPlanById(id);
+        if (!existsClientPlan || existsClientPlan.length === 0) {
+            console.log(chalk.yellow(`No se encontró ninguna asignación con el ID: ${id}`));
+            return;
+        }
+
+        const clientPlan = existsClientPlan[0];
+        if (clientPlan.estado !== 'activo') {
+            console.log(chalk.yellow(`No se puede registrar seguimiento físico. La asignación con ID ${id} se encuentra en estado "${clientPlan.estado}" y debe estar "activo".`));
+            return;
+        }
+
+        console.log(chalk.cyan(`Asignación seleccionada: Cliente: ${clientPlan.cliente} | Plan: ${clientPlan.plan} | Estado: ${clientPlan.estado}`));
+
+        const { semana } = await Enquirer.prompt({
+            type: 'input',
+            name: 'semana',
+            message: 'Semana de seguimiento: ',
+            validate(val) {
+                return !isNaN(val) && Number(val) > 0 ? true : 'Debe ingresar un número de semana válido (mayor a 0).';
+            }
+        });
+
+        const today = new Date();
+        const defaultDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+        const { fecha_registro } = await Enquirer.prompt({
+            type: 'input',
+            name: 'fecha_registro',
+            message: 'Fecha de Registro (YYYY-MM-DD): ',
+            initial: defaultDate,
+            validate(val) {
+                const d = new Date(val + 'T00:00:00');
+                return !isNaN(d.getTime()) && val.trim() !== '' ? true : 'Debe ingresar una fecha válida en formato YYYY-MM-DD.';
+            }
+        });
+
+        const { peso_kg } = await Enquirer.prompt({
+            type: 'input',
+            name: 'peso_kg',
+            message: 'Peso en kg: ',
+            validate(val) {
+                return !isNaN(val) && Number(val) > 0 ? true : 'Debe ingresar un peso numérico válido (mayor a 0).';
+            }
+        });
+
+        const { grasa_corporal } = await Enquirer.prompt({
+            type: 'input',
+            name: 'grasa_corporal',
+            message: 'Porcentaje de grasa corporal (% opcional, presione enter para omitir): ',
+            validate(val) {
+                return val.trim() === '' || (!isNaN(val) && Number(val) >= 0) ? true : 'Debe ingresar un porcentaje válido o dejarlo vacío.';
+            }
+        });
+
+        const { altura_cm } = await Enquirer.prompt({
+            type: 'input',
+            name: 'altura_cm',
+            message: 'Altura en cm (opcional, presione enter para omitir): ',
+            validate(val) {
+                return val.trim() === '' || (!isNaN(val) && Number(val) > 0) ? true : 'Debe ingresar una altura válida o dejarlo vacío.';
+            }
+        });
+
+        const { fotos } = await Enquirer.prompt({
+            type: 'input',
+            name: 'fotos',
+            message: 'URL / Ruta de fotos (opcional, presione enter para omitir): '
+        });
+
+        const { comentarios } = await Enquirer.prompt({
+            type: 'input',
+            name: 'comentarios',
+            message: 'Comentarios / observaciones (opcional, presione enter para omitir): '
+        });
+
+        const newTracking = EntityFactory.create('seguimiento_fisico', {
+            id_cliente_plan: Number(id),
+            semana: Number(semana),
+            fecha_registro: fecha_registro.trim(),
+            peso_kg: parseFloat(peso_kg),
+            grasa_corporal: grasa_corporal.trim() !== '' ? parseFloat(grasa_corporal) : null,
+            altura_cm: altura_cm.trim() !== '' ? parseFloat(altura_cm) : null,
+            fotos: fotos.trim() !== '' ? fotos.trim() : null,
+            comentarios: comentarios.trim() !== '' ? comentarios.trim() : null
+        });
+
+        const result = await SeguimientoFisicoService.create(newTracking);
+        console.log(chalk.green.bold(`Seguimiento físico registrado exitosamente con ID: ${result.insertId}`));
+    }
+    catch(err){
         problem(err);
     }
 }

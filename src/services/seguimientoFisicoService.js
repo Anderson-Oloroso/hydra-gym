@@ -26,4 +26,45 @@ export class SeguimientoFisicoService {
         const [ rows ] = await db.query(query);
         return rows;
     }
+
+    static async getClientPlanById(id) {
+        const db = await connection();
+        const query = `
+            SELECT 
+                cp.id_cliente_plan,
+                cp.id_cliente,
+                CONCAT(c.nombre, ' ', c.apellido) AS cliente,
+                cp.id_plan,
+                p.nombre_plan AS plan,
+                cp.estado,
+                cp.fecha_inicio,
+                cp.fecha_fin
+            FROM cliente_plan_entrenamiento cp
+            LEFT JOIN clientes c ON cp.id_cliente = c.id_cliente
+            LEFT JOIN plan_entrenamiento p ON cp.id_plan = p.id_plan
+            WHERE cp.id_cliente_plan = ?
+        `;
+        const [ rows ] = await db.query(query, [id]);
+        return rows;
+    }
+
+    static async create(record) {
+        const db = await connection();
+        const query = `
+            INSERT INTO seguimiento_fisico 
+            (id_cliente_plan, semana, fecha_registro, peso_kg, grasa_corporal, altura_cm, fotos, comentarios) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        const [ result ] = await db.execute(query, [
+            record.id_cliente_plan,
+            record.semana,
+            record.fecha_registro,
+            record.peso_kg,
+            record.grasa_corporal,
+            record.altura_cm,
+            record.fotos,
+            record.comentarios
+        ]);
+        return result;
+    }
 }

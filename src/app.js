@@ -4,6 +4,7 @@ import { listFinancialCat, createFinancialCat, updateFinancialCat, deleteFinanci
 import { listClient, getById, getByName, createClient, updateClient, deleteClient } from './commands/clienteCmd.js';
 import { listWorkoutPlan, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } from './commands/planEntrenamientoCmd.js';
 import { listClientPlan, createClientPlan, updateClientPlan, deleteClientPlan } from './commands/clientePlanEntrenamientoCmd.js';
+import { listNutritionPlan, createNutritionPlan, updateNutritionPlan, deleteNutritionPlan } from './commands/planNutricionCmd.js';
 import { listPhysicalTracking, createPhysicalTracking, updatePhysicalTracking, deletePhysicalTracking } from './commands/seguimientoFisicoCmd.js';
 import { listMealDetail, createMealDetail, updateMealDetail, deleteMealDetail } from './commands/detalleComidaCmd.js';
 import { listContract, updateContract } from './commands/contratoCmd.js';
@@ -164,6 +165,22 @@ async function main(){
                         }
                         break;
 
+                    case 'PLANES DE NUTRICION':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listNutritionPlan();
+                                break;
+
+                            case 'Crear registros':
+                                await createNutritionPlan();
+                                break;
+
+                            case 'Actualizar registros':
+                                await updateNutritionPlan();
+                                break;
+
+                            case 'Eliminar registros':
+                                await deleteNutritionPlan();
                     case 'SEGUIMIENTO FISICO':
                         switch (selectedAction) {
                             case 'Listar registros':

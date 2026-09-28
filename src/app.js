@@ -1,10 +1,13 @@
 import { mainMenu, submenu, pause, clearScreen } from './utils/menu.js';
-import { listFinancialRecord, createFinancialRecord, updateFinancialRecord, deleteFinancialRecord } from './commands/gestionFinancieraCmd.js';
+import { listFinancialRecord, createFinancialRecord, updateFinancialRecord, deleteFinancialRecord, showFinancialBalance } from './commands/gestionFinancieraCmd.js';
 import { listFinancialCat, createFinancialCat, updateFinancialCat, deleteFinancialCat } from './commands/categoriaFinancieraCmd.js';
 import { listClient, getById, getByName, createClient, updateClient, deleteClient } from './commands/clienteCmd.js';
 import { listWorkoutPlan, createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan } from './commands/planEntrenamientoCmd.js';
 import { listClientPlan, createClientPlan, updateClientPlan, deleteClientPlan } from './commands/clientePlanEntrenamientoCmd.js';
 import { listNutritionPlan, createNutritionPlan, updateNutritionPlan, deleteNutritionPlan } from './commands/planNutricionCmd.js';
+import { listPhysicalTracking, createPhysicalTracking, updatePhysicalTracking, deletePhysicalTracking } from './commands/seguimientoFisicoCmd.js';
+import { listMealDetail, createMealDetail, updateMealDetail, deleteMealDetail } from './commands/detalleComidaCmd.js';
+import { listContract, updateContract } from './commands/contratoCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
@@ -128,6 +131,10 @@ async function main(){
                                 await deleteFinancialRecord();
                                 break;
 
+                            case 'Ver balance financiero (general y por categorías)':
+                                await showFinancialBalance();
+                                break;
+
                             default:
                                 console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
                                 break;
@@ -174,6 +181,48 @@ async function main(){
 
                             case 'Eliminar registros':
                                 await deleteNutritionPlan();
+                    case 'SEGUIMIENTO FISICO':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listPhysicalTracking();
+                                break;
+
+                            case 'Crear registros':
+                                await createPhysicalTracking();
+                                break;
+
+                            case 'Actualizar registros':
+                                await updatePhysicalTracking();
+                                break;
+
+                            case 'Eliminar registros':
+                                await deletePhysicalTracking();
+                                
+                                break;
+                    case 'DETALLE DE COMIDA DIARIA':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listMealDetail();
+                                break;
+
+                            case 'Crear registros':
+                                await createMealDetail();
+                                break;
+
+                            case 'Actualizar registros':
+                                await updateMealDetail();
+                                break;
+
+                            case 'Eliminar registros':
+                                await deleteMealDetail();
+                    case 'CONTRATOS':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listContract();
+                                break;
+
+                            case 'Actualizar registros':
+                                await updateContract();
                                 break;
 
                             default:

@@ -2,6 +2,7 @@ import Enquirer from "enquirer";
 import chalk from "chalk";
 import { EntityFactory } from "../models/entityFactory.js";
 import { ClientePlanEntrenamientoService } from "../services/clientePlanEntrenamientoService.js";
+import { ContratoService } from "../services/contratoService.js";
 
 function problem(err){
     console.log(chalk.red.bold(`Error en operación de cliente - plan de entrenamiento: ${err.message || err}`));
@@ -124,6 +125,18 @@ export async function createClientPlan(){
 
         const result = await ClientePlanEntrenamientoService.create(newClientPlan);
         console.log(chalk.green.bold(`Asignación de plan de entrenamiento creada exitosamente con ID: ${result.insertId}`));
+
+        const autoContrato = EntityFactory.create('contrato', {
+            id_cliente_plan: result.insertId,
+            condiciones: 'Respetar las normas internas del gimnasio, cumplir con los horarios establecidos y hacer uso adecuado de las instalaciones y equipo.',
+            duracion_dias: Number(plan.duracion_dias),
+            precio: parseFloat(plan.precio),
+            fecha_inicio: `${fecha_inicio.trim()} 00:00:00`,
+            fecha_fin: `${fecha_fin} 23:59:59`
+        });
+
+        await ContratoService.create(autoContrato);
+        console.log(chalk.green.bold('Contrato creado automáticamente'));
     }
     catch(err){
         problem(err);

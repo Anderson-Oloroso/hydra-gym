@@ -49,6 +49,23 @@ export class ContratoService {
         return rows;
     }
 
+    static async create(contract) {
+        const db = await connection();
+        const query = `
+            INSERT INTO contrato (id_cliente_plan, condiciones, duracion_dias, precio, fecha_inicio, fecha_fin)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `;
+        const [ result ] = await db.execute(query, [
+            contract.id_cliente_plan,
+            contract.condiciones,
+            contract.duracion_dias,
+            contract.precio,
+            contract.fecha_inicio,
+            contract.fecha_fin
+        ]);
+        return result;
+    }
+
     static async update(id, record) {
         const db = await connection();
         const query = 'UPDATE contrato SET condiciones = ?, precio = ? WHERE id_contrato = ?';

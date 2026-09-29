@@ -39,8 +39,6 @@ hydra-gym/
 │   └── script/
 │       ├── schema.sql        # Creación de tablas, claves foráneas y relaciones
 │       ├── insert.sql        # Datos iniciales y catálogos base
-│       ├── queries.sql       # Consultas analíticas y reportes
-│       └── transactions.sql  # Procedimientos y transacciones SQL
 ├── src/
 │   ├── app.js                # Punto de entrada y orquestador del ciclo de vida CLI
 │   ├── commands/             # Capa de presentación e interacción CLI (Enquirer + Chalk)
@@ -178,3 +176,5 @@ npm start
 * **Creador:** [Anderson-Oloroso](https://github.com/Anderson-Oloroso)
 * **Proyecto:** Hydra Gym CLI
 * **Objetivo:** Desarrollar una solución integral, estructurada y profesional en Node.js y MySQL para la gestión operativa y financiera de un gimnasio, implementando buenas prácticas de arquitectura de software, principios SOLID y patrones de diseño creacionales.
+
+* **Ultima modificación:** _29/9/2026_

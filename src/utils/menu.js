@@ -4,12 +4,12 @@ import Enquirer from "enquirer";
 const entities = [
   'CLIENTES',
   'PLANES DE ENTRENAMIENTO',
+  'CLIENTE - PLAN DE ENTRENAMIENTO',
   'GESTION FINANCIERA',
   'CATEGORIAS FINANCIERAS',
   'PLANES DE NUTRICION',
   'DETALLE DE COMIDA DIARIA',
   'SEGUIMIENTO FISICO',
-  'CLIENTE - PLAN DE ENTRENAMIENTO',
   'CONTRATOS'
 ];
 
@@ -42,9 +42,9 @@ export async function mainMenu() {
 }
 
 export function header(entity){
-    console.log(chalk.yellow('==================================================='));
-    console.log(chalk.redBright(`        Gestion de ${entity}    `));
-    console.log(chalk.yellow('==================================================='));
+    console.log(chalk.yellow('=========================================================='));
+    console.log(chalk.redBright(`    >>> Gestion de ${entity}    `));
+    console.log(chalk.yellow('=========================================================='));
 }
 
 const crud = [

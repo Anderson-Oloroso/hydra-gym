@@ -223,9 +223,9 @@ export async function deleteClient(){
 
         if(answer){
             console.log(chalk.red(`Eliminando cliente con id ${id} ...`));
-            const result = await ClientService.deleteClient(id);
+            await ClientService.deleteClient(id);
 
-            console.log(result);
+            console.log(chalk.green.bold(`Cliente con id ${id} eliminado correctamente`));
 
         }
         else{

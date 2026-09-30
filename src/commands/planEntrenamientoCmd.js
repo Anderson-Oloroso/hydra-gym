@@ -179,7 +179,7 @@ export async function deleteWorkoutPlan(){
         }).run();
         if(answer){
             console.log(chalk.red(`Eliminando plan de entrenamiento con ID ${id} ...`));
-            const result = await PlanEntrenamientoService.delete(id);
+            await PlanEntrenamientoService.delete(id);
             console.log(chalk.green.bold(`Plan de entrenamiento con ID ${id} eliminado exitosamente.`));
         }
         else{

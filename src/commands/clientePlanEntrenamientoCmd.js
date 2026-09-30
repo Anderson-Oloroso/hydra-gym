@@ -224,6 +224,7 @@ export async function deleteClientPlan(){
                 return !isNaN(val) && val.trim() !== '' ? true : 'Debe ingresar un ID numérico válido.';
             }
         });
+        const records = await ClientePlanEntrenamientoService.list()
         const existsClient = await ClientePlanEntrenamientoService.getClientById(id);
         if (!existsClient || existsClient.length === 0) {
             console.log(chalk.yellow(`No se encontró ningún cliente con el ID: ${id}`));
@@ -231,7 +232,8 @@ export async function deleteClientPlan(){
         }
 
         console.log(chalk.cyan('Datos del cliente y su plan de entrenmiento ...'));
-        console.table([existsClient[0]]);
+        let findRecord = records.find(dt => dt.id_cliente === existsClient[0].id_cliente)
+        console.table(formatClientPlans(findRecord));
 
         const answer = await new Enquirer.Confirm({
             name: 'confirmacion',

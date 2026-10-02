@@ -3,6 +3,7 @@ import chalk from "chalk";
 import { EntityFactory } from "../models/entityFactory.js";
 import { ClientePlanEntrenamientoService } from "../services/clientePlanEntrenamientoService.js";
 import { ContratoService } from "../services/contratoService.js";
+import { GestionFinancieraService } from "../services/gestionFinancieraService.js";
 
 function problem(err){
     console.log(chalk.red.bold(`Error en operación de cliente - plan de entrenamiento: ${err.message || err}`));
@@ -72,7 +73,13 @@ export async function createClientPlan(){
             return;
         }
 
-        console.log(chalk.cyan(`Cliente seleccionado: ${existsClient[0].nombre} ${existsClient[0].apellido}`));
+        const cliente = existsClient[0];
+        if (!cliente.activo) {
+            console.log(chalk.yellow(`No se puede asignar un plan. El cliente ${cliente.nombre} ${cliente.apellido} se encuentra INACTIVO en el sistema.`));
+            return;
+        }
+
+        console.log(chalk.cyan(`Cliente seleccionado: ${cliente.nombre} ${cliente.apellido}`));
 
         const { idPlan } = await Enquirer.prompt({
             type: 'input',
@@ -90,6 +97,11 @@ export async function createClientPlan(){
         }
 
         const plan = existsPlan[0];
+        if (!plan.activo) {
+            console.log(chalk.yellow(`No se puede asignar el plan "${plan.nombre_plan}" porque se encuentra INACTIVO en el catálogo.`));
+            return;
+        }
+
         console.log(chalk.cyan(`Plan seleccionado: ${plan.nombre_plan} | Duración: ${plan.duracion_dias} días | Precio: Q${Number(plan.precio).toFixed(2)}`));
 
         const today = new Date();
@@ -137,6 +149,15 @@ export async function createClientPlan(){
 
         await ContratoService.create(autoContrato);
         console.log(chalk.green.bold('Contrato creado automáticamente'));
+
+        const newFinancialRecord = EntityFactory.create('gestion_financiera', {
+            id_categoria: 1,
+            id_cliente: Number(id),
+            monto: parseFloat(plan.precio).toFixed(2),
+            descripcion: `Pago por plan de entrenamiento: ${plan.nombre_plan} para el cliente ${existsClient[0].nombre} ${existsClient[0].apellido}`,
+        });
+        await GestionFinancieraService.create(newFinancialRecord);
+        console.log(chalk.green.bold('Registro financiero creado automáticamente'));
     }
     catch(err){
         problem(err);
@@ -244,7 +265,6 @@ export async function deleteClientPlan(){
         if (answer) {
             console.log(chalk.red(`Eliminando registro con ID ${id} ...`));
             await ClientePlanEntrenamientoService.delete(id);
-
             console.log(chalk.green.bold(`Cliente - plan de entrenamiento con ID ${id} eliminado exitosamente.`));
         } else {
             console.log(chalk.blue('Eliminación cancelada'));

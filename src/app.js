@@ -11,6 +11,28 @@ import { listContract, updateContract } from './commands/contratoCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
 
+process.on('uncaughtException', (err) => {
+    if (err.code === 'ERR_USE_AFTER_CLOSE' || (err.message && err.message.includes('readline was closed'))) {
+        process.exit(0);
+    }
+    console.error(err);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+    if (!reason || reason === '' || (reason.message && reason.message.includes('readline was closed'))) {
+        process.exit(0);
+    }
+});
+
+process.on('SIGINT', async () => {
+    console.log(chalk.green.bold('\n\nSaliendo del programa...'));
+    try {
+        await closeConnection();
+    } catch {}
+    process.exit(0);
+});
+
 async function main(){
     while(true){
         try{
@@ -263,10 +285,12 @@ async function main(){
             }
         }
         catch(err){
-            if (err) {
+            if (err && err !== '' && err.message !== '') {
                 console.log(chalk.red('Error: '), err.message || err);
             }
-            await closeConnection();
+            try {
+                await closeConnection();
+            } catch {}
             process.exit(0);
         }
     }

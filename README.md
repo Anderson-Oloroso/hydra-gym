@@ -6,12 +6,13 @@ Aplicación interactiva de consola (CLI) desarrollada en **Node.js** y **MySQL**
 
 ## Tabla de Contenidos
 1. [Descripción del Proyecto](#descripción-del-proyecto)
-2. [Estructura del Proyecto](#estructura-del-proyecto)
-3. [Instrucciones de Instalación y Uso](#instrucciones-de-instalación-y-uso)
-4. [Principios SOLID Aplicados](#principios-solid-aplicados)
-5. [Patrones de Diseño Usados](#patrones-de-diseño-usados)
-6. [Consideraciones Técnicas](#consideraciones-técnicas)
-7. [Créditos, Creador y Objetivo](#créditos-creador-y-objetivo)
+2. [Diagrama MER](#diagrama-mer)
+3. [Estructura del Proyecto](#estructura-del-proyecto)
+4. [Instrucciones de Instalación y Uso](#instrucciones-de-instalación-y-uso)
+5. [Principios SOLID Aplicados](#principios-solid-aplicados)
+6. [Patrones de Diseño Usados](#patrones-de-diseño-usados)
+7. [Consideraciones Técnicas](#consideraciones-técnicas)
+8. [Créditos, Creador y Objetivo](#créditos-creador-y-objetivo)
 
 ---
 
@@ -25,6 +26,12 @@ Aplicación interactiva de consola (CLI) desarrollada en **Node.js** y **MySQL**
 * **Seguimiento Físico:** Monitoreo semanal de composición corporal (peso, porcentaje de grasa, altura) y notas de evolución.
 * **Nutrición Personalizada:** Creación de planes alimenticios y detalle de comidas diarias por momentos del día.
 * **Gestión Financiera:** Registro de ingresos y egresos, categorización y reportes de balances netos.
+
+---
+
+## Diagrama MER
+
+![Diagrama MER de Hydra Gym](database/diagrams/wkb_hydra_gym.png)
 
 ---
 

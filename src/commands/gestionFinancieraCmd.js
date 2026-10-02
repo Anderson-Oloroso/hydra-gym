@@ -84,15 +84,16 @@ export async function createFinancialRecord(){
 
         if (categoriaEncontrada.tipo === 'ingreso') {
             const clientes = await ClientService.list();
-            if (!clientes || clientes.length === 0) {
-                console.log(chalk.red('No hay clientes registrados en el sistema. Los ingresos requieren obligatoriamente un cliente.'));
+            const clientesActivos = (clientes || []).filter(c => c.activo);
+            if (!clientesActivos || clientesActivos.length === 0) {
+                console.log(chalk.red('No hay clientes activos registrados en el sistema. Los ingresos requieren obligatoriamente un cliente activo.'));
                 return;
             }
 
             const clientePrompt = new Enquirer.Select({
                 name: 'cliente',
                 message: 'Seleccione el cliente asociado al ingreso (obligatorio):',
-                choices: clientes.map(c => ({
+                choices: clientesActivos.map(c => ({
                     name: `${c.id_cliente}`,
                     message: `${c.id_cliente}. ${c.nombre} ${c.apellido} (DPI: ${c.dpi})`,
                     value: c.id_cliente
@@ -100,7 +101,7 @@ export async function createFinancialRecord(){
             });
 
             const idClienteSeleccionado = await clientePrompt.run();
-            const clienteEncontrado = clientes.find(c => c.id_cliente === Number(idClienteSeleccionado));
+            const clienteEncontrado = clientesActivos.find(c => c.id_cliente === Number(idClienteSeleccionado));
 
             if (!clienteEncontrado) {
                 console.log(chalk.red('Debe seleccionar un cliente válido para un ingreso.'));
@@ -200,17 +201,18 @@ export async function updateFinancialRecord(){
 
         if (categoriaEncontrada.tipo === 'ingreso') {
             const clientes = await ClientService.list();
-            if (!clientes || clientes.length === 0) {
-                console.log(chalk.red('No hay clientes registrados en el sistema. Los ingresos requieren obligatoriamente un cliente.'));
+            const clientesActivos = (clientes || []).filter(c => c.activo);
+            if (!clientesActivos || clientesActivos.length === 0) {
+                console.log(chalk.red('No hay clientes activos registrados en el sistema. Los ingresos requieren obligatoriamente un cliente activo.'));
                 return;
             }
 
-            const clienteActual = clientes.find(c => c.id_cliente === currentFinancialRecord.id_cliente);
+            const clienteActual = clientesActivos.find(c => c.id_cliente === currentFinancialRecord.id_cliente);
 
             const clientePrompt = new Enquirer.Select({
                 name: 'cliente',
                 message: 'Seleccione el cliente asociado al ingreso (obligatorio):',
-                choices: clientes.map(c => ({
+                choices: clientesActivos.map(c => ({
                     name: `${c.id_cliente}`,
                     message: `${c.id_cliente}. ${c.nombre} ${c.apellido} (DPI: ${c.dpi})`,
                     value: c.id_cliente
@@ -219,7 +221,7 @@ export async function updateFinancialRecord(){
             });
 
             const idClienteSeleccionado = await clientePrompt.run();
-            const clienteEncontrado = clientes.find(c => c.id_cliente === Number(idClienteSeleccionado));
+            const clienteEncontrado = clientesActivos.find(c => c.id_cliente === Number(idClienteSeleccionado));
 
             if (!clienteEncontrado) {
                 console.log(chalk.red('Debe seleccionar un cliente válido para un ingreso.'));

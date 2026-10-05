@@ -184,4 +184,4 @@ npm start
 * **Proyecto:** Hydra Gym CLI
 * **Objetivo:** Desarrollar una solución integral, estructurada y profesional en Node.js y MySQL para la gestión operativa y financiera de un gimnasio, implementando buenas prácticas de arquitectura de software, principios SOLID y patrones de diseño creacionales.
 
-* **Ultima modificación:** _29/9/2026_
+* **Ultima modificación:** _05/10/2026_

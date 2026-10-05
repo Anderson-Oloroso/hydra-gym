@@ -7,6 +7,7 @@ import { DetalleComida } from './detalleComida.js';
 import { SeguimientoFisico } from './seguimientoFisico.js';
 import { GestionFinanciera } from './gestionFinanciera.js';
 import { Contrato } from './contrato.js';
+import { Asistencia } from './controlAsistencia.js';
 
 export class EntityFactory{
     
@@ -85,6 +86,14 @@ export class EntityFactory{
                     data.precio,
                     data.fecha_inicio,
                     data.fecha_fin
+                );
+            case 'control_asistencia':
+                return new Asistencia(
+                    data.id_cliente,
+                    data.id_cliente_plan,
+                    data.id_plan_entrenamiento,
+                    data.tipo_sesion,
+                    data.notas
                 );
             default:
                 throw new Error(`[ EntityError ] -> Tipo de identidad no reconocida: ${entityType}`);

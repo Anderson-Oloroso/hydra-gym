@@ -10,7 +10,8 @@ const entities = [
   'PLANES DE NUTRICION',
   'DETALLE DE COMIDA DIARIA',
   'SEGUIMIENTO FISICO',
-  'CONTRATOS'
+  'CONTRATOS',
+  'CONTROL ASISTENCIAS'
 ];
 
 
@@ -76,6 +77,11 @@ export async function submenu(entity) {
             'Listar registros',
             'Actualizar registros'
         ];
+    }else if(entity.toLowerCase() === 'control asistencias'){
+        options = [
+            'Listar registros',
+            'Crear registros'
+        ]
     }
 
     const propmt = new Enquirer.Select({

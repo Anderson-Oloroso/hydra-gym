@@ -7,6 +7,7 @@ import { listClientPlan, createClientPlan, updateClientPlan, deleteClientPlan } 
 import { listNutritionPlan, createNutritionPlan, updateNutritionPlan, deleteNutritionPlan } from './commands/planNutricionCmd.js';
 import { listPhysicalTracking, createPhysicalTracking, updatePhysicalTracking, deletePhysicalTracking } from './commands/seguimientoFisicoCmd.js';
 import { listMealDetail, createMealDetail, updateMealDetail, deleteMealDetail } from './commands/detalleComidaCmd.js';
+import { listAsistencias, createAsistencia } from './commands/controlAsistencia.js';
 import { listContract, updateContract } from './commands/contratoCmd.js';
 import { closeConnection } from './config/database.js';
 import chalk from 'chalk';
@@ -268,6 +269,22 @@ async function main(){
 
                             case 'Actualizar registros':
                                 await updateContract();
+                                break;
+
+                            default:
+                                console.log(chalk.yellow(`Acción no implementada: ${selectedAction}`));
+                                break;
+                        }
+                        break;
+
+                    case 'CONTROL ASISTENCIAS':
+                        switch (selectedAction) {
+                            case 'Listar registros':
+                                await listAsistencias();
+                                break;
+
+                            case 'Crear registros':
+                                await createAsistencia();
                                 break;
 
                             default:

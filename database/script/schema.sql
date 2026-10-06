@@ -110,13 +110,11 @@ CREATE TABLE gestion_financiera (
 CREATE TABLE asistencias(
     id_asistencia INT AUTO_INCREMENT PRIMARY KEY,
     id_cliente INT NOT NULL,
-    id_plan_entrenamiento INT NOT NULL,
-    id_cliente_plan_entrenamiento INT NOT NULL,
+    id_cliente_plan INT NOT NULL,
     fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
     tipo_sesion ENUM('grupal', 'individual') NOT NULL,
     notas VARCHAR(255),
     FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (id_plan_entrenamiento) REFERENCES plan_entrenamiento(id_plan) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (id_cliente_plan_entrenamiento) REFERENCES cliente_plan_entrenamiento(id_cliente_plan) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (id_cliente_plan) REFERENCES cliente_plan_entrenamiento(id_cliente_plan) ON DELETE CASCADE ON UPDATE CASCADE
 );
 

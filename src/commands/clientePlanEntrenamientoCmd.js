@@ -135,29 +135,24 @@ export async function createClientPlan(){
             estado: 'activo'
         });
 
-        const result = await ClientePlanEntrenamientoService.create(newClientPlan);
-        console.log(chalk.green.bold(`Asignación de plan de entrenamiento creada exitosamente con ID: ${result.insertId}`));
-
-        const autoContrato = EntityFactory.create('contrato', {
-            id_cliente_plan: result.insertId,
+        const contratoData = {
             condiciones: 'Respetar las normas internas del gimnasio, cumplir con los horarios establecidos y hacer uso adecuado de las instalaciones y equipo.',
             duracion_dias: Number(plan.duracion_dias),
             precio: parseFloat(plan.precio),
             fecha_inicio: `${fecha_inicio.trim()} 00:00:00`,
             fecha_fin: `${fecha_fin} 23:59:59`
-        });
+        };
 
-        await ContratoService.create(autoContrato);
-        console.log(chalk.green.bold('Contrato creado automáticamente'));
-
-        const newFinancialRecord = EntityFactory.create('gestion_financiera', {
+        const financialData = {
             id_categoria: 1,
             id_cliente: Number(id),
             monto: parseFloat(plan.precio).toFixed(2),
-            descripcion: `Pago por plan de entrenamiento: ${plan.nombre_plan} para el cliente ${existsClient[0].nombre} ${existsClient[0].apellido}`,
-        });
-        await GestionFinancieraService.create(newFinancialRecord);
-        console.log(chalk.green.bold('Registro financiero creado automáticamente'));
+            descripcion: `Pago por plan de entrenamiento: ${plan.nombre_plan} para el cliente ${cliente.nombre} ${cliente.apellido}`
+        };
+
+        const result = await ClientePlanEntrenamientoService.createSubscriptionTransaction(newClientPlan, contratoData, financialData);
+        console.log(chalk.green.bold(`Asignación creada con ID: ${result.insertId}`));
+        console.log(chalk.green.bold('Contrato y registro financiero creados atómicamente en transacción ACID'));
     }
     catch(err){
         problem(err);

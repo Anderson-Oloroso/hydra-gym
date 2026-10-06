@@ -133,3 +133,13 @@ INSERT INTO gestion_financiera (id_categoria, id_cliente, monto, fecha_transacci
 (7, NULL, 2500.00, '2026-03-01 08:00:00', 'Pago mensual de arrendamiento del local comercial Hydra Gym'),
 (8, NULL, 1800.00, '2026-02-28 17:00:00', 'Pago quincenal a entrenadores de planta y personal de limpieza'),
 (8, NULL, 1800.00, '2026-03-15 17:00:00', 'Pago quincenal a entrenadores de planta y personal de limpieza');
+
+-- ===================================================
+-- 7. CONTROL DE ASISTENCIAS
+-- ===================================================
+INSERT INTO asistencias (id_cliente, id_cliente_plan, fecha, tipo_sesion, notas) VALUES
+(1, 1, '2026-02-02 08:30:00', 'individual', 'Primera sesión: Evaluación y técnica básica.'),
+(1, 1, '2026-02-04 08:30:00', 'individual', 'Entrenamiento de torso superior.'),
+(2, 2, '2026-02-16 10:00:00', 'grupal', 'Clase de acondicionamiento matutino.'),
+(5, 4, '2026-02-21 09:00:00', 'individual', 'Sesión de cardio y definición.'),
+(6, 5, '2026-03-02 17:00:00', 'grupal', 'Entrenamiento funcional.');

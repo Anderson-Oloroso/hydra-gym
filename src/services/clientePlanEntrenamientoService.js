@@ -78,6 +78,50 @@ export class ClientePlanEntrenamientoService {
         return result;
     }
 
+    static async createSubscriptionTransaction(newClientPlan, contratoData, financialData) {
+        const db = await connection();
+        try {
+            await db.beginTransaction();
+
+            // 1. Insertar cliente_plan_entrenamiento
+            const queryPlan = 'INSERT INTO cliente_plan_entrenamiento (id_cliente, id_plan, fecha_inicio, fecha_fin, estado) VALUES (?, ?, ?, ?, ?)';
+            const [ resultPlan ] = await db.execute(queryPlan, [
+                newClientPlan.id_cliente,
+                newClientPlan.id_plan,
+                newClientPlan.fecha_inicio,
+                newClientPlan.fecha_fin,
+                newClientPlan.estado
+            ]);
+            const idClientePlan = resultPlan.insertId;
+
+            // 2. Insertar contrato
+            const queryContrato = 'INSERT INTO contrato (id_cliente_plan, condiciones, duracion_dias, precio, fecha_inicio, fecha_fin) VALUES (?, ?, ?, ?, ?, ?)';
+            await db.execute(queryContrato, [
+                idClientePlan,
+                contratoData.condiciones,
+                contratoData.duracion_dias,
+                contratoData.precio,
+                contratoData.fecha_inicio,
+                contratoData.fecha_fin
+            ]);
+
+            // 3. Insertar registro financiero
+            const queryFinanzas = 'INSERT INTO gestion_financiera (id_categoria, id_cliente, monto, descripcion) VALUES (?, ?, ?, ?)';
+            await db.execute(queryFinanzas, [
+                financialData.id_categoria,
+                financialData.id_cliente,
+                financialData.monto,
+                financialData.descripcion
+            ]);
+
+            await db.commit();
+            return { insertId: idClientePlan };
+        } catch (error) {
+            await db.rollback();
+            throw error;
+        }
+    }
+
     static async update(id, updatedPlan) {
         const db = await connection();
         const query = 'UPDATE cliente_plan_entrenamiento SET fecha_inicio = ?, fecha_fin = ?, estado = ? WHERE id_cliente_plan = ?';

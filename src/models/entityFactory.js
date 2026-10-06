@@ -91,7 +91,6 @@ export class EntityFactory{
                 return new Asistencia(
                     data.id_cliente,
                     data.id_cliente_plan,
-                    data.id_plan_entrenamiento,
                     data.tipo_sesion,
                     data.notas
                 );
